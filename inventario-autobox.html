@@ -691,12 +691,12 @@ function renderMovimientos(){
 // ── ACCIONES ─────────────────────────────────────────────
 async function addItem(tipo){
   const p=tipo==='maquina'?'mq':'mt';
-  const nombre=document.getElementById(p+'-nombre').value.trim();
+  const nombre=document.getElementById(p+'-nombre').value.trim().toUpperCase();
   const stock=parseFloat(document.getElementById(p+'-stock-ini').value)||0;
   const min=parseFloat(document.getElementById(p+'-min').value)||0;
   const cat=document.getElementById(p+'-cat').value;
   const unidad=document.getElementById(p+'-unidad').value;
-  const nota=document.getElementById(p+'-nota').value.trim();
+  const nota=document.getElementById(p+'-nota').value.trim().toUpperCase();
   if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
   document.getElementById(p+'-nombre').classList.remove('error');
   const btnId='btn-'+p;
