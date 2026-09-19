@@ -504,24 +504,26 @@ function setSyncStatus(state,msg){
 
 function jsonpGet(params){
   return new Promise((resolve,reject)=>{
-    const old=document.getElementById('_jget');if(old)old.remove();
-    const cb='jg_'+Date.now(); window[cb]=function(d){delete window[cb];resolve(d);};
-    const s=document.createElement('script');s.id='_jget';
+    const uid='_jget_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const cb='jg_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    window[cb]=function(d){delete window[cb];const el=document.getElementById(uid);if(el)el.remove();resolve(d);};
+    const s=document.createElement('script');s.id=uid;
     const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
     s.src=SCRIPT_URL+'?'+qs;
-    s.onerror=()=>{delete window[cb];reject(new Error('Error de red'));};
+    s.onerror=()=>{delete window[cb];const el=document.getElementById(uid);if(el)el.remove();reject(new Error('Error de red'));};
     document.head.appendChild(s);
   });
 }
 
 function jsonpAction(params){
   return new Promise((resolve,reject)=>{
-    const old=document.getElementById('_jact');if(old)old.remove();
-    const cb='ja_'+Date.now(); window[cb]=function(d){delete window[cb];resolve(d);};
-    const s=document.createElement('script');s.id='_jact';
+    const uid='_jact_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const cb='ja_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    window[cb]=function(d){delete window[cb];const el=document.getElementById(uid);if(el)el.remove();resolve(d);};
+    const s=document.createElement('script');s.id=uid;
     const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
     s.src=SCRIPT_URL+'?'+qs;
-    s.onerror=()=>{delete window[cb];reject(new Error('Error de red'));};
+    s.onerror=()=>{delete window[cb];const el=document.getElementById(uid);if(el)el.remove();reject(new Error('Error de red'));};
     document.head.appendChild(s);
   });
 }
