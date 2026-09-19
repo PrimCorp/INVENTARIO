@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AUTOBOX · Inventario</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#f7f7f5;--surface:#fff;--surface2:#f2f2ef;--border:#e4e4e0;--border2:#d0d0cc;
+  --text:#1a1a1a;--text2:#555550;--text3:#999990;
+  --accent:#2563eb;--accent-light:#eff6ff;
+  --green:#16a34a;--green-light:#f0fdf4;
+  --red:#dc2626;--red-light:#fef2f2;
+  --amber:#d97706;--amber-light:#fffbeb;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+  --shadow:0 4px 16px rgba(0,0,0,0.07);
+  --radius:14px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px 0;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.app-logo{font-family:'DM Serif Display',serif;font-size:1.2rem;}
+.app-logo span{color:var(--accent);}
+.sync-pill{display:flex;align-items:center;gap:4px;font-size:0.68rem;color:var(--text3);padding:4px 9px;border-radius:50px;background:var(--surface2);border:1px solid var(--border);white-space:nowrap;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.sync-dot.loading{background:var(--amber);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+
+/* TABS */
+.tabs{display:flex;}
+.tab{flex:1;padding:10px 4px;text-align:center;font-size:0.75rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab.active.tab-mat{color:var(--green);border-bottom-color:var(--green);}
+.tab.active.tab-mov{color:var(--amber);border-bottom-color:var(--amber);}
+
+/* BODY */
+.app-body{max-width:480px;margin:0 auto;padding:16px 16px 100px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.kpi-card{background:var(--surface);border-radius:var(--radius);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.kpi-card.full{grid-column:1/-1;}
+.kpi-label{font-size:0.68rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.kpi-value{font-size:1.6rem;font-weight:700;color:var(--text);line-height:1;}
+.kpi-value.blue{color:var(--accent);}
+.kpi-value.green{color:var(--green);}
+.kpi-value.red{color:var(--red);}
+.kpi-value.amber{color:var(--amber);}
+.kpi-sub{font-size:0.7rem;color:var(--text3);margin-top:4px;}
+
+/* SECTION */
+.section-title{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:18px 0 10px;display:flex;align-items:center;justify-content:space-between;}
+.divider{height:1px;background:var(--border);margin:4px 0 16px;}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color .15s;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:1rem;}
+
+/* ITEM CARD */
+.item-list{display:flex;flex-direction:column;gap:8px;}
+.item-card{background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);padding:14px 16px;box-shadow:var(--shadow-sm);transition:border-color .2s;animation:fadeUp .3s ease both;}
+.item-card.alerta-baja{border-left:3px solid var(--red);}
+.item-card.alerta-media{border-left:3px solid var(--amber);}
+.item-card-top{display:flex;align-items:flex-start;gap:10px;}
+.item-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.item-info{flex:1;min-width:0;}
+.item-nombre{font-weight:700;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-cat{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:50px;display:inline-block;margin-top:3px;}
+.item-nota{font-size:0.68rem;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-stock-wrap{text-align:right;flex-shrink:0;}
+.item-stock-val{font-size:1.4rem;font-weight:700;line-height:1;}
+.item-stock-unit{font-size:0.68rem;color:var(--text3);}
+.item-alerta{font-size:0.65rem;font-weight:700;margin-top:3px;}
+
+/* ITEM ACTIONS */
+.item-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.act-btn{flex:1;padding:8px 6px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:none;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2);}
+.act-btn.add{border-color:var(--green);color:var(--green);}
+.act-btn.add:hover{background:var(--green-light);}
+.act-btn.sub{border-color:var(--red);color:var(--red);}
+.act-btn.sub:hover{background:var(--red-light);}
+.act-btn.del{border-color:var(--border2);color:var(--text3);}
+.act-btn.del:hover{background:var(--red-light);color:var(--red);border-color:var(--red);}
+
+/* FILTROS */
+.filter-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:10px;}
+.filter-scroll::-webkit-scrollbar{display:none;}
+.filter-chip{white-space:nowrap;padding:5px 12px;border-radius:50px;border:1.5px solid var(--border);background:var(--surface);font-size:0.72rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;flex-shrink:0;font-family:'DM Sans',sans-serif;}
+.filter-chip.active-blue{background:var(--accent);border-color:var(--accent);color:#fff;}
+.filter-chip.active-green{background:var(--green);border-color:var(--green);color:#fff;}
+
+/* FORM */
+.form-card{background:var(--surface);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:16px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:11px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:0.7rem;font-weight:600;color:var(--text2);margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:var(--surface);}
+.field input.error{border-color:var(--red);}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23999' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+
+/* BTN */
+.btn-primary{width:100%;padding:13px;border:none;border-radius:var(--radius-sm);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary.blue{background:var(--accent);box-shadow:0 2px 8px rgba(37,99,235,.25);}
+.btn-primary.blue:hover{background:#1d4ed8;transform:translateY(-1px);}
+.btn-primary.green{background:var(--green);box-shadow:0 2px 8px rgba(22,163,74,.25);}
+.btn-primary.green:hover{background:#15803d;transform:translateY(-1px);}
+.btn-primary.amber{background:var(--amber);}
+.btn-primary.amber:hover{background:#b45309;transform:translateY(-1px);}
+.btn-primary:disabled{background:var(--border2)!important;box-shadow:none!important;cursor:not-allowed;transform:none!important;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease;}
+.modal-box{background:var(--surface);border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .25s ease;}
+.modal-title{font-weight:700;font-size:1rem;margin-bottom:16px;}
+.modal-row{display:flex;gap:10px;margin-bottom:14px;}
+.modal-input{flex:1;padding:12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;text-align:center;outline:none;color:var(--text);}
+.modal-input:focus{border-color:var(--accent);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:13px;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;}
+.modal-btn.confirm{background:var(--accent);color:#fff;}
+.modal-btn.cancel{background:var(--surface2);color:var(--text2);}
+
+/* MOVIMIENTOS */
+.mov-list{display:flex;flex-direction:column;gap:8px;}
+.mov-item{background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;gap:12px;animation:fadeUp .3s ease both;}
+.mov-badge{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+.mov-info{flex:1;min-width:0;}
+.mov-nombre{font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mov-meta{font-size:0.7rem;color:var(--text3);margin-top:2px;}
+.mov-delta{font-weight:700;font-size:0.95rem;flex-shrink:0;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:36px 20px;color:var(--text3);background:var(--surface);border-radius:var(--radius);border:1px dashed var(--border2);}
+.empty-icon{font-size:2rem;display:block;margin-bottom:8px;}
+.empty-msg{font-size:0.82rem;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;border-radius:50px;padding:10px 20px;font-size:0.82rem;font-weight:500;box-shadow:var(--shadow);z-index:999;white-space:nowrap;animation:toastIn .25s ease;}
+.toast.error{background:var(--red);}
+.toast.success{background:var(--green);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@media(max-width:360px){.kpi-value{font-size:1.35rem;}.form-row{grid-template-columns:1fr;}.form-row3{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-top">
+    <div class="app-logo">Auto<span>Box</span> · Inventario</div>
+    <div class="sync-pill">
+      <div class="sync-dot loading" id="sync-dot"></div>
+      <span id="sync-txt">Cargando</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tab-maquinas" onclick="switchTab('maquinas')">🤖 Máquinas</button>
+    <button class="tab" id="tab-materiales" onclick="switchTab('materiales')">🔩 Materiales</button>
+    <button class="tab" id="tab-movimientos" onclick="switchTab('movimientos')">📋 Movimientos</button>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- ═══ MÁQUINAS ═══ -->
+  <div class="tab-panel active" id="panel-maquinas">
+    <div style="margin-top:4px;"></div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total modelos</div>
+        <div class="kpi-value blue" id="mq-total">0</div>
+        <div class="kpi-sub">en inventario</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Stock total</div>
+        <div class="kpi-value green" id="mq-stock">0</div>
+        <div class="kpi-sub">unidades disponibles</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Stock bajo</div>
+        <div class="kpi-value red" id="mq-bajo">0</div>
+        <div class="kpi-sub">modelos con alerta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sin stock</div>
+        <div class="kpi-value amber" id="mq-cero">0</div>
+        <div class="kpi-sub">modelos agotados</div>
+      </div>
+    </div>
+
+    <div class="section-title">Buscar y filtrar</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mq-search" placeholder="Buscar máquina…" oninput="renderMaquinas()">
+    </div>
+    <div class="filter-scroll" id="mq-filters"></div>
+    <div class="item-list" id="mq-list">
+      <div class="empty-state"><span class="empty-icon">🤖</span><div class="empty-msg">Cargando…</div></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Agregar máquina</div>
+    <div class="form-card">
+      <div class="field">
+        <label>Nombre / Modelo *</label>
+        <input type="text" id="mq-nombre" placeholder="Ej: MINI Arduino 1 salida, ESTÁNDAR PLC 4 salidas…" maxlength="80"/>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Categoría</label>
+          <select id="mq-cat">
+            <option value="mini">📦 MINI</option>
+            <option value="estandar">🗄️ ESTÁNDAR</option>
+            <option value="premium">🏭 PREMIUM/PERSONALIZADA</option>
+            <option value="repuesto">⚙️ Repuesto</option>
+            <option value="otro">📋 Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Stock inicial *</label>
+          <input type="number" id="mq-stock-ini" placeholder="0" min="0" step="1" inputmode="numeric"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Stock mínimo (alerta)</label>
+          <input type="number" id="mq-min" placeholder="1" min="0" step="1" inputmode="numeric"/>
+        </div>
+        <div class="field">
+          <label>Unidad</label>
+          <select id="mq-unidad">
+            <option value="unidad">unidad</option>
+            <option value="par">par</option>
+            <option value="set">set</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Nota (opcional)</label>
+        <input type="text" id="mq-nota" placeholder="Color, variante, precio referencial…" maxlength="100"/>
+      </div>
+      <button class="btn-primary blue" id="btn-mq" onclick="addItem('maquina')">＋ Agregar Máquina</button>
+    </div>
+
+    <div class="section-title" style="margin-top:20px;">Exportar</div>
+    <button class="btn-primary amber" onclick="exportarExcel('maquina')" style="margin-bottom:0;">⬇️ Exportar Máquinas a Excel</button>
+  </div>
+
+  <!-- ═══ MATERIALES ═══ -->
+  <div class="tab-panel" id="panel-materiales">
+    <div style="margin-top:4px;"></div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total ítems</div>
+        <div class="kpi-value blue" id="mt-total">0</div>
+        <div class="kpi-sub">en inventario</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Stock total</div>
+        <div class="kpi-value green" id="mt-stock">0</div>
+        <div class="kpi-sub">unidades disponibles</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Stock bajo</div>
+        <div class="kpi-value red" id="mt-bajo">0</div>
+        <div class="kpi-sub">ítems con alerta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sin stock</div>
+        <div class="kpi-value amber" id="mt-cero">0</div>
+        <div class="kpi-sub">ítems agotados</div>
+      </div>
+    </div>
+
+    <div class="section-title">Buscar y filtrar</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mt-search" placeholder="Buscar material…" oninput="renderMateriales()">
+    </div>
+    <div class="filter-scroll" id="mt-filters"></div>
+    <div class="item-list" id="mt-list">
+      <div class="empty-state"><span class="empty-icon">🔩</span><div class="empty-msg">Cargando…</div></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Agregar material</div>
+    <div class="form-card">
+      <div class="field">
+        <label>Nombre *</label>
+        <input type="text" id="mt-nombre" placeholder="Ej: Bomba 12V media calidad, Arduino Uno, Cable 2m…" maxlength="80"/>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Categoría</label>
+          <select id="mt-cat">
+            <option value="electronica">⚡ Electrónica</option>
+            <option value="bombas">💧 Bombas</option>
+            <option value="cables">🔌 Cables y Conectores</option>
+            <option value="estructura">🔧 Estructura y Tornillería</option>
+            <option value="plc">🖥️ PLC y Control</option>
+            <option value="sensores">📡 Sensores</option>
+            <option value="display">📟 Display y Pantallas</option>
+            <option value="fuentes">🔋 Fuentes de Poder</option>
+            <option value="otro">📦 Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Stock inicial *</label>
+          <input type="number" id="mt-stock-ini" placeholder="0" min="0" step="1" inputmode="numeric"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Stock mínimo (alerta)</label>
+          <input type="number" id="mt-min" placeholder="2" min="0" step="1" inputmode="numeric"/>
+        </div>
+        <div class="field">
+          <label>Unidad</label>
+          <select id="mt-unidad">
+            <option value="unidad">unidad</option>
+            <option value="metros">metros</option>
+            <option value="kg">kg</option>
+            <option value="rollo">rollo</option>
+            <option value="par">par</option>
+            <option value="set">set</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Nota (opcional)</label>
+        <input type="text" id="mt-nota" placeholder="Proveedor, referencia, voltaje, modelo…" maxlength="100"/>
+      </div>
+      <button class="btn-primary green" id="btn-mt" onclick="addItem('material')">＋ Agregar Material</button>
+    </div>
+
+    <div class="section-title" style="margin-top:20px;">Exportar</div>
+    <button class="btn-primary amber" onclick="exportarExcel('material')" style="margin-bottom:0;">⬇️ Exportar Materiales a Excel</button>
+  </div>
+
+  <!-- ═══ MOVIMIENTOS ═══ -->
+  <div class="tab-panel" id="panel-movimientos">
+    <div style="margin-top:4px;"></div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total movimientos</div>
+        <div class="kpi-value blue" id="mv-total">0</div>
+        <div class="kpi-sub">registrados</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Entradas</div>
+        <div class="kpi-value green" id="mv-entradas">0</div>
+        <div class="kpi-sub">unidades ingresadas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Salidas</div>
+        <div class="kpi-value red" id="mv-salidas">0</div>
+        <div class="kpi-sub">unidades despachadas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Este mes</div>
+        <div class="kpi-value amber" id="mv-mes">0</div>
+        <div class="kpi-sub">movimientos</div>
+      </div>
+    </div>
+    <div class="section-title">Historial</div>
+    <div class="filter-scroll" id="mv-filters">
+      <button class="filter-chip active-blue" onclick="setFiltroMov('all',this)">Todos</button>
+      <button class="filter-chip" onclick="setFiltroMov('entrada',this)">✅ Entradas</button>
+      <button class="filter-chip" onclick="setFiltroMov('salida',this)">📤 Salidas</button>
+      <button class="filter-chip" onclick="setFiltroMov('maquina',this)">🤖 Máquinas</button>
+      <button class="filter-chip" onclick="setFiltroMov('material',this)">🔩 Materiales</button>
+    </div>
+    <div class="mov-list" id="mv-list">
+      <div class="empty-state"><span class="empty-icon">📋</span><div class="empty-msg">Cargando movimientos…</div></div>
+    </div>
+    <div class="section-title" style="margin-top:20px;">Exportar</div>
+    <button class="btn-primary amber" onclick="exportarExcel('movimientos')" style="margin-bottom:0;">⬇️ Exportar Movimientos a Excel</button>
+  </div>
+
+</div>
+
+<!-- MODAL STOCK -->
+<div class="modal-overlay" id="modal" style="display:none;" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Actualizar stock</div>
+    <div style="font-size:0.82rem;color:var(--text2);margin-bottom:12px;" id="modal-item-name"></div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Cantidad</label>
+        <input type="number" class="modal-input" id="modal-qty" placeholder="0" min="1" step="1" inputmode="numeric"/>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Motivo</label>
+        <select class="modal-input" id="modal-motivo" style="text-align:left;font-size:0.82rem;font-weight:500;">
+          <option value="compra">🛒 Compra</option>
+          <option value="devolucion">↩️ Devolución</option>
+          <option value="ajuste">🔧 Ajuste</option>
+          <option value="venta">💰 Venta</option>
+          <option value="uso_produccion">🏭 Uso en producción</option>
+          <option value="dano">⚠️ Daño/Pérdida</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Registrado por</label>
+      <select class="modal-input" id="modal-usuario" style="text-align:left;font-size:0.88rem;font-weight:500;">
+        <option value="Danny">👤 Danny</option>
+        <option value="Tatiana">👤 Tatiana</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="modal-btn confirm" id="modal-confirm" onclick="confirmarStock()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGQ_Uzova6QNWz-gT57ZTyUcwV3PcDonM4W83eiwJbSkHPEMi-IVkfgWlJU-q152fW/exec';
+
+const CATS_MQ = {
+  mini:      {label:'MINI',          emoji:'📦', color:'#2563eb', bg:'#eff6ff'},
+  estandar:  {label:'ESTÁNDAR',      emoji:'🗄️', color:'#16a34a', bg:'#f0fdf4'},
+  premium:   {label:'PREMIUM',       emoji:'🏭', color:'#7c3aed', bg:'#f5f3ff'},
+  repuesto:  {label:'Repuesto',      emoji:'⚙️', color:'#d97706', bg:'#fffbeb'},
+  otro:      {label:'Otro',          emoji:'📋', color:'#6b7280', bg:'#f9fafb'},
+};
+const CATS_MT = {
+  electronica: {label:'Electrónica',  emoji:'⚡', color:'#2563eb', bg:'#eff6ff'},
+  bombas:      {label:'Bombas',       emoji:'💧', color:'#0891b2', bg:'#ecfeff'},
+  cables:      {label:'Cables',       emoji:'🔌', color:'#d97706', bg:'#fffbeb'},
+  estructura:  {label:'Estructura',   emoji:'🔧', color:'#6b7280', bg:'#f9fafb'},
+  plc:         {label:'PLC',          emoji:'🖥️', color:'#7c3aed', bg:'#f5f3ff'},
+  sensores:    {label:'Sensores',     emoji:'📡', color:'#0f766e', bg:'#f0fdfa'},
+  display:     {label:'Display',      emoji:'📟', color:'#db2777', bg:'#fdf2f8'},
+  fuentes:     {label:'Fuentes',      emoji:'🔋', color:'#16a34a', bg:'#f0fdf4'},
+  otro:        {label:'Otro',         emoji:'📦', color:'#6b7280', bg:'#f9fafb'},
+};
+
+let maquinas=[], materiales=[], movimientos=[];
+let filtroMQ='all', filtroMT='all', filtroMV='all';
+let modalData=null;
+
+// ── SYNC ─────────────────────────────────────────────────
+function setSyncStatus(state,msg){
+  document.getElementById('sync-dot').className='sync-dot'+(state==='loading'?' loading':state==='error'?' error':'');
+  document.getElementById('sync-txt').textContent=msg;
+}
+
+function jsonpGet(params){
+  return new Promise((resolve,reject)=>{
+    const old=document.getElementById('_jget');if(old)old.remove();
+    const cb='jg_'+Date.now(); window[cb]=function(d){delete window[cb];resolve(d);};
+    const s=document.createElement('script');s.id='_jget';
+    const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    s.src=SCRIPT_URL+'?'+qs;
+    s.onerror=()=>{delete window[cb];reject(new Error('Error de red'));};
+    document.head.appendChild(s);
+  });
+}
+
+function jsonpAction(params){
+  return new Promise((resolve,reject)=>{
+    const old=document.getElementById('_jact');if(old)old.remove();
+    const cb='ja_'+Date.now(); window[cb]=function(d){delete window[cb];resolve(d);};
+    const s=document.createElement('script');s.id='_jact';
+    const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    s.src=SCRIPT_URL+'?'+qs;
+    s.onerror=()=>{delete window[cb];reject(new Error('Error de red'));};
+    document.head.appendChild(s);
+  });
+}
+
+async function cargarTodo(){
+  setSyncStatus('loading','Cargando…');
+  try{
+    const [mq,mt,mv]=await Promise.all([
+      jsonpGet({tipo:'maquina'}),
+      jsonpGet({tipo:'material'}),
+      jsonpGet({action:'get_movimientos'}),
+    ]);
+    maquinas=Array.isArray(mq)?mq:[];
+    materiales=Array.isArray(mt)?mt:[];
+    movimientos=Array.isArray(mv)?mv:[];
+    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+    localStorage.setItem('inv_mt',JSON.stringify(materiales));
+    localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+    setSyncStatus('ok','Sincronizado');
+    render();
+  }catch(e){
+    setSyncStatus('error','Sin conexión');
+    maquinas=JSON.parse(localStorage.getItem('inv_mq')||'[]');
+    materiales=JSON.parse(localStorage.getItem('inv_mt')||'[]');
+    movimientos=JSON.parse(localStorage.getItem('inv_mv')||'[]');
+    render();
+    toast('Sin conexión. Datos locales.','error');
+  }
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getMesMov(m){
+  const hoy=new Date();
+  // fecha viene como dd/mm/yyyy from Apps Script toLocaleDateString es-EC
+  const parts=String(m.fecha||'').split('/');
+  if(parts.length===3){
+    const mes=parseInt(parts[1])-1, anio=parseInt(parts[2]);
+    return mes===hoy.getMonth()&&anio===hoy.getFullYear();
+  }
+  return false;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render(){renderMaquinas();renderMateriales();renderMovimientos();}
+
+function renderKpiItems(items,prefix){
+  const bajo=items.filter(i=>i.stock>0&&i.stock<=i.stock_minimo).length;
+  const cero=items.filter(i=>i.stock===0).length;
+  document.getElementById(prefix+'-total').textContent=items.length;
+  document.getElementById(prefix+'-stock').textContent=items.reduce((s,i)=>s+i.stock,0);
+  document.getElementById(prefix+'-bajo').textContent=bajo;
+  document.getElementById(prefix+'-cero').textContent=cero;
+}
+
+function renderItems(items,catsMap,listId,filtersId,filtro,activeClass,searchId,tipo){
+  const q=(document.getElementById(searchId)?.value||'').toLowerCase();
+  const filtered=items.filter(i=>{
+    const matchCat=filtro==='all'||i.categoria===filtro;
+    const matchQ=!q||i.nombre.toLowerCase().includes(q)||(i.nota||'').toLowerCase().includes(q);
+    return matchCat&&matchQ;
+  });
+
+  // Filtros
+  const cats=[...new Set(items.map(i=>i.categoria))];
+  const fEl=document.getElementById(filtersId);
+  fEl.innerHTML='<button class="filter-chip '+(filtro==='all'?activeClass:'')+'" onclick="setFiltro(\''+tipo+'\',\'all\',this)">Todos ('+items.length+')</button>';
+  cats.forEach(cat=>{
+    const c=catsMap[cat]||{emoji:'📦',label:cat};
+    const cnt=items.filter(i=>i.categoria===cat).length;
+    fEl.innerHTML+='<button class="filter-chip '+(filtro===cat?activeClass:'')+'" onclick="setFiltro(\''+tipo+'\',\''+cat+'\',this)">'+c.emoji+' '+c.label+' ('+cnt+')</button>';
+  });
+
+  const el=document.getElementById(listId);
+  if(!filtered.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">'+(tipo==='maquina'?'🤖':'🔩')+'</span><div class="empty-msg">Sin resultados</div></div>';
+    return;
+  }
+
+  // Ordenar: agotados abajo, bajo stock medio, ok arriba
+  const sorted=[...filtered].sort((a,b)=>{
+    const pa=a.stock===0?2:a.stock<=a.stock_minimo?1:0;
+    const pb=b.stock===0?2:b.stock<=b.stock_minimo?1:0;
+    if(pa!==pb)return pa-pb;
+    return a.nombre.localeCompare(b.nombre);
+  });
+
+  el.innerHTML=sorted.map(item=>{
+    const c=catsMap[item.categoria]||{emoji:'📦',label:item.categoria,color:'#6b7280',bg:'#f9fafb'};
+    const isAgotado=item.stock===0;
+    const isBajo=!isAgotado&&item.stock<=item.stock_minimo&&item.stock_minimo>0;
+    const stockColor=isAgotado?'var(--red)':isBajo?'var(--amber)':'var(--green)';
+    const alertaClass=isAgotado?'alerta-baja':isBajo?'alerta-media':'';
+    const alertaTxt=isAgotado?'<div class="item-alerta" style="color:var(--red);">⚠️ AGOTADO</div>':
+      isBajo?'<div class="item-alerta" style="color:var(--amber);">⚠️ Stock bajo (mín: '+item.stock_minimo+')</div>':'';
+    return '<div class="item-card '+alertaClass+'">'+
+      '<div class="item-card-top">'+
+        '<div class="item-icon" style="background:'+c.bg+';">'+c.emoji+'</div>'+
+        '<div class="item-info">'+
+          '<div class="item-nombre">'+escHtml(item.nombre)+'</div>'+
+          '<span class="item-cat" style="background:'+c.bg+';color:'+c.color+';">'+c.label+'</span>'+
+          (item.nota?'<div class="item-nota">'+escHtml(item.nota)+'</div>':'')+
+          alertaTxt+
+        '</div>'+
+        '<div class="item-stock-wrap">'+
+          '<div class="item-stock-val" style="color:'+stockColor+';">'+item.stock+'</div>'+
+          '<div class="item-stock-unit">'+escHtml(item.unidad||'unidad')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="item-actions">'+
+        '<button class="act-btn add" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\',\''+escHtml(item.nombre)+'\')">＋ Entrada</button>'+
+        '<button class="act-btn sub" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\',\''+escHtml(item.nombre)+'\')">− Salida</button>'+
+        '<button class="act-btn del" onclick="eliminarItem(\''+item.id+'\',\''+tipo+'\')">🗑️ Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderMaquinas(){
+  renderKpiItems(maquinas,'mq');
+  renderItems(maquinas,CATS_MQ,'mq-list','mq-filters',filtroMQ,'active-blue','mq-search','maquina');
+}
+function renderMateriales(){
+  renderKpiItems(materiales,'mt');
+  renderItems(materiales,CATS_MT,'mt-list','mt-filters',filtroMT,'active-green','mt-search','material');
+}
+
+function renderMovimientos(){
+  const entradas=movimientos.filter(m=>m.delta>0);
+  const salidas=movimientos.filter(m=>m.delta<0);
+  const mesMov=movimientos.filter(m=>getMesMov(m));
+  document.getElementById('mv-total').textContent=movimientos.length;
+  document.getElementById('mv-entradas').textContent=entradas.reduce((s,m)=>s+m.delta,0);
+  document.getElementById('mv-salidas').textContent=Math.abs(salidas.reduce((s,m)=>s+m.delta,0));
+  document.getElementById('mv-mes').textContent=mesMov.length;
+
+  const filtered=filtroMV==='all'?movimientos:
+    filtroMV==='entrada'?movimientos.filter(m=>m.delta>0):
+    filtroMV==='salida'?movimientos.filter(m=>m.delta<0):
+    movimientos.filter(m=>m.tipo===filtroMV);
+
+  const el=document.getElementById('mv-list');
+  if(!filtered.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-msg">Sin movimientos</div></div>';
+    return;
+  }
+  const sorted=[...filtered].reverse();
+  el.innerHTML=sorted.map(m=>{
+    const esEntrada=m.delta>0;
+    const tipoEmoji=m.tipo==='maquina'?'🤖':'🔩';
+    return '<div class="mov-item">'+
+      '<div class="mov-badge" style="background:'+(esEntrada?'#f0fdf4':'#fef2f2')+';">'+(esEntrada?'📥':'📤')+'</div>'+
+      '<div class="mov-info">'+
+        '<div class="mov-nombre">'+tipoEmoji+' '+escHtml(m.item_nombre)+'</div>'+
+        '<div class="mov-meta">'+escHtml(m.motivo||'—')+' · '+escHtml(m.usuario||'—')+' · '+escHtml(m.fecha||'—')+'</div>'+
+      '</div>'+
+      '<div class="mov-delta" style="color:'+(esEntrada?'var(--green)':'var(--red)');+';">'+(esEntrada?'+':'')+m.delta+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ── ACCIONES ─────────────────────────────────────────────
+async function addItem(tipo){
+  const p=tipo==='maquina'?'mq':'mt';
+  const nombre=document.getElementById(p+'-nombre').value.trim();
+  const stock=parseFloat(document.getElementById(p+'-stock-ini').value)||0;
+  const min=parseFloat(document.getElementById(p+'-min').value)||0;
+  const cat=document.getElementById(p+'-cat').value;
+  const unidad=document.getElementById(p+'-unidad').value;
+  const nota=document.getElementById(p+'-nota').value.trim();
+  if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
+  document.getElementById(p+'-nombre').classList.remove('error');
+  const btnId='btn-'+p;
+  const btn=document.getElementById(btnId);
+  btn.disabled=true;btn.textContent='Guardando…';
+  const item={id:Date.now().toString(),nombre,categoria:cat,stock,stock_minimo:min,unidad,nota};
+  try{
+    await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota});
+    if(stock>0){
+      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario:'Danny'};
+      await jsonpAction({action:'add_movimiento',...mv});
+      movimientos.push(mv);
+    }
+    if(tipo==='maquina')maquinas.push(item); else materiales.push(item);
+    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+    localStorage.setItem('inv_mt',JSON.stringify(materiales));
+    render();
+    document.getElementById(p+'-nombre').value='';
+    document.getElementById(p+'-stock-ini').value='';
+    document.getElementById(p+'-nota').value='';
+    toast('Ítem agregado ✓','success');
+  }catch(e){toast('Error al guardar','error');}
+  finally{btn.disabled=false;btn.textContent='＋ Agregar '+(tipo==='maquina'?'Máquina':'Material');}
+}
+
+function abrirModal(itemId,tipo,direccion,nombre){
+  modalData={itemId,tipo,direccion};
+  document.getElementById('modal-title').textContent=direccion==='entrada'?'📥 Registrar Entrada':'📤 Registrar Salida';
+  document.getElementById('modal-item-name').textContent=nombre;
+  // Ajustar opciones de motivo según dirección
+  const motSel=document.getElementById('modal-motivo');
+  if(direccion==='entrada'){
+    motSel.innerHTML='<option value="compra">🛒 Compra</option><option value="devolucion">↩️ Devolución</option><option value="ajuste">🔧 Ajuste de inventario</option>';
+  }else{
+    motSel.innerHTML='<option value="venta">💰 Venta</option><option value="uso_produccion">🏭 Uso en producción</option><option value="dano">⚠️ Daño/Pérdida</option><option value="ajuste">🔧 Ajuste de inventario</option>';
+  }
+  document.getElementById('modal-qty').value='';
+  const lastUser=localStorage.getItem('inv_usuario');
+  if(lastUser)document.getElementById('modal-usuario').value=lastUser;
+  document.getElementById('modal').style.display='flex';
+  setTimeout(()=>document.getElementById('modal-qty').focus(),100);
+}
+
+function cerrarModal(){document.getElementById('modal').style.display='none';modalData=null;}
+
+async function confirmarStock(){
+  if(!modalData)return;
+  const qty=parseFloat(document.getElementById('modal-qty').value);
+  const motivo=document.getElementById('modal-motivo').value;
+  const usuario=document.getElementById('modal-usuario').value;
+  if(!qty||qty<=0){toast('Ingresa una cantidad válida','error');return;}
+  localStorage.setItem('inv_usuario',usuario);
+  const delta=modalData.direccion==='entrada'?qty:-qty;
+  const btn=document.getElementById('modal-confirm');
+  btn.disabled=true;btn.textContent='Guardando…';
+  try{
+    // Actualizar stock
+    await jsonpAction({action:'update_stock',tipo:modalData.tipo,id:modalData.itemId,delta});
+    // Registrar movimiento
+    const lista=modalData.tipo==='maquina'?maquinas:materiales;
+    const item=lista.find(i=>i.id===modalData.itemId);
+    if(item){
+      item.stock=Math.max(0,item.stock+delta);
+      const mv={id:Date.now().toString(),tipo:modalData.tipo,item_id:modalData.itemId,item_nombre:item?.nombre||'',delta,motivo,usuario};
+      await jsonpAction({action:'add_movimiento',...mv});
+      movimientos.push(mv);
+    }
+    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+    localStorage.setItem('inv_mt',JSON.stringify(materiales));
+    localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+    cerrarModal();
+    render();
+    toast('Stock actualizado ✓','success');
+  }catch(e){toast('Error al actualizar','error');}
+  finally{btn.disabled=false;btn.textContent='Confirmar';}
+}
+
+async function eliminarItem(id,tipo){
+  const lista=tipo==='maquina'?maquinas:materiales;
+  const item=lista.find(i=>i.id===id);
+  if(!item||!confirm('¿Eliminar "'+item.nombre+'" del inventario?'))return;
+  try{
+    await jsonpAction({action:'delete_item',tipo,id});
+    if(tipo==='maquina')maquinas=maquinas.filter(i=>i.id!==id);
+    else materiales=materiales.filter(i=>i.id!==id);
+    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+    localStorage.setItem('inv_mt',JSON.stringify(materiales));
+    render();
+    toast('Ítem eliminado','success');
+  }catch(e){toast('Error al eliminar','error');}
+}
+
+function setFiltro(tipo,cat,btn){
+  if(tipo==='maquina')filtroMQ=cat; else filtroMT=cat;
+  const ac=tipo==='maquina'?'active-blue':'active-green';
+  const cid=tipo==='maquina'?'mq-filters':'mt-filters';
+  document.querySelectorAll('#'+cid+' .filter-chip').forEach(b=>b.classList.remove(ac));
+  btn.classList.add(ac);
+  if(tipo==='maquina')renderMaquinas(); else renderMateriales();
+}
+
+function setFiltroMov(f,btn){
+  filtroMV=f;
+  document.querySelectorAll('#mv-filters .filter-chip').forEach(b=>b.classList.remove('active-blue'));
+  btn.classList.add('active-blue');
+  renderMovimientos();
+}
+
+function switchTab(tab){
+  ['maquinas','materiales','movimientos'].forEach(t=>{
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+    const el=document.getElementById('tab-'+t);
+    el.classList.toggle('active',t===tab);
+    el.classList.remove('tab-mat','tab-mov');
+  });
+  if(tab==='materiales')document.getElementById('tab-materiales').classList.add('tab-mat');
+  if(tab==='movimientos')document.getElementById('tab-movimientos').classList.add('tab-mov');
+}
+
+function toast(msg,type=''){
+  const old=document.querySelector('.toast');if(old)old.remove();
+  const t=document.createElement('div');
+  t.className='toast'+(type?' '+type:'');t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},2800);
+}
+
+// ── EXPORT EXCEL ─────────────────────────────────────────
+function exportarExcel(tipo){
+  const wb=XLSX.utils.book_new();
+  const fecha=new Date().toLocaleDateString('es-EC');
+  if(tipo==='maquina'||tipo==='material'){
+    const items=tipo==='maquina'?maquinas:materiales;
+    const cats=tipo==='maquina'?CATS_MQ:CATS_MT;
+    const nombre=tipo==='maquina'?'Máquinas':'Materiales';
+    if(!items.length){toast('No hay ítems en '+nombre,'error');return;}
+    // Resumen
+    const bajo=items.filter(i=>i.stock>0&&i.stock<=i.stock_minimo);
+    const cero=items.filter(i=>i.stock===0);
+    const res=[
+      ['INVENTARIO AUTOBOX - '+nombre.toUpperCase()],['Exportado:',fecha],[],
+      ['RESUMEN'],['Total ítems',items.length],
+      ['Stock total',items.reduce((s,i)=>s+i.stock,0)],
+      ['Stock bajo',bajo.length],['Agotados',cero.length],[],
+      ['ALERTAS DE STOCK BAJO'],['Ítem','Stock actual','Stock mínimo'],
+    ];
+    bajo.concat(cero).forEach(i=>res.push([i.nombre,i.stock,i.stock_minimo]));
+    const wsR=XLSX.utils.aoa_to_sheet(res);
+    wsR['!cols']=[{wch:32},{wch:14},{wch:14}];
+    XLSX.utils.book_append_sheet(wb,wsR,'Resumen');
+    // Detalle
+    const det=[['DETALLE - '+nombre.toUpperCase()],[],['Nombre','Categoría','Stock','Stock mín.','Unidad','Nota','Últ. actualización']];
+    [...items].sort((a,b)=>a.nombre.localeCompare(b.nombre)).forEach(i=>{
+      det.push([i.nombre,(cats[i.categoria]||{label:i.categoria}).label,i.stock,i.stock_minimo,i.unidad||'unidad',i.nota||'',i.fecha||'']);
+    });
+    const wsD=XLSX.utils.aoa_to_sheet(det);
+    wsD['!cols']=[{wch:36},{wch:16},{wch:10},{wch:10},{wch:10},{wch:28},{wch:14}];
+    XLSX.utils.book_append_sheet(wb,wsD,nombre);
+    XLSX.writeFile(wb,'AUTOBOX_Inventario_'+nombre+'_'+fecha.replace(/\//g,'-')+'.xlsx');
+  } else {
+    // Movimientos
+    if(!movimientos.length){toast('No hay movimientos','error');return;}
+    const det=[['MOVIMIENTOS AUTOBOX'],[],['Fecha','Tipo','Ítem','Delta','Motivo','Usuario']];
+    [...movimientos].reverse().forEach(m=>{
+      det.push([m.fecha||'',m.tipo==='maquina'?'Máquina':'Material',m.item_nombre,m.delta,m.motivo||'',m.usuario||'']);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(det);
+    ws['!cols']=[{wch:14},{wch:12},{wch:32},{wch:8},{wch:20},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws,'Movimientos');
+    XLSX.writeFile(wb,'AUTOBOX_Movimientos_'+fecha.replace(/\//g,'-')+'.xlsx');
+  }
+  toast('Excel descargado ✓','success');
+}
+
+// ── INIT ─────────────────────────────────────────────────
+const lastUser=localStorage.getItem('inv_usuario');
+if(lastUser)document.getElementById('modal-usuario').value=lastUser;
+document.getElementById('modal-qty').addEventListener('keydown',e=>{if(e.key==='Enter')confirmarStock();});
+cargarTodo();
+setInterval(cargarTodo,60000);
+</script>
+</body>
+</html>
