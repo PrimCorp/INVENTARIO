@@ -311,15 +311,37 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="field">
           <label>Categoría</label>
           <select id="mt-cat">
-            <option value="electronica">⚡ Electrónica</option>
-            <option value="bombas">💧 Bombas</option>
-            <option value="cables">🔌 Cables y Conectores</option>
-            <option value="estructura">🔧 Estructura y Tornillería</option>
-            <option value="plc">🖥️ PLC y Control</option>
-            <option value="sensores">📡 Sensores</option>
-            <option value="display">📟 Display y Pantallas</option>
-            <option value="fuentes">🔋 Fuentes de Poder</option>
-            <option value="otro">📦 Otro</option>
+            <optgroup label="── Electrónica ──">
+              <option value="microcontroladores">🤖 Microcontroladores (Arduino, ESP32…)</option>
+              <option value="modulos">📦 Módulos (Relé, Puente H, L298N…)</option>
+              <option value="reguladores">⚡ Reguladores de voltaje (LM2596…)</option>
+              <option value="diodos">🔺 Diodos (1N5408, 1N4007…)</option>
+              <option value="transistores">🔷 Transistores</option>
+              <option value="capacitores">🔵 Capacitores (100nF, 470uF…)</option>
+              <option value="resistencias">〰️ Resistencias</option>
+              <option value="leds">💡 LEDs</option>
+              <option value="pulsadores">🔘 Pulsadores / Botones</option>
+              <option value="display">📟 Display / Pantallas</option>
+              <option value="fuentes">🔋 Fuentes de Poder</option>
+              <option value="motores">⚙️ Motores (65rpm…)</option>
+              <option value="plc">🖥️ PLC y Control</option>
+              <option value="sensores">📡 Sensores</option>
+              <option value="baquelita">🟫 Baquelita / PCB</option>
+              <option value="monedero">🪙 Monedero</option>
+              <option value="bombas">💧 Bombas</option>
+            </optgroup>
+            <optgroup label="── Materiales físicos ──">
+              <option value="cables">🔌 Cables</option>
+              <option value="remaches">🔩 Remaches / Tornillería</option>
+              <option value="taype">🎗️ Taype / Cinta</option>
+              <option value="amarras">🪢 Amarras</option>
+              <option value="espiral">🌀 Espiral para cables</option>
+              <option value="llantas">⚫ Llantas / Ruedas</option>
+              <option value="enchufe">🔌 Enchufes</option>
+              <option value="manguera">🟢 Manguera</option>
+              <option value="estructura">🔧 Estructura / Chapa</option>
+              <option value="otro">📦 Otro</option>
+            </optgroup>
           </select>
         </div>
         <div class="field">
@@ -444,15 +466,35 @@ const CATS_MQ = {
   otro:      {label:'Otro',          emoji:'📋', color:'#6b7280', bg:'#f9fafb'},
 };
 const CATS_MT = {
-  electronica: {label:'Electrónica',  emoji:'⚡', color:'#2563eb', bg:'#eff6ff'},
-  bombas:      {label:'Bombas',       emoji:'💧', color:'#0891b2', bg:'#ecfeff'},
-  cables:      {label:'Cables',       emoji:'🔌', color:'#d97706', bg:'#fffbeb'},
-  estructura:  {label:'Estructura',   emoji:'🔧', color:'#6b7280', bg:'#f9fafb'},
-  plc:         {label:'PLC',          emoji:'🖥️', color:'#7c3aed', bg:'#f5f3ff'},
-  sensores:    {label:'Sensores',     emoji:'📡', color:'#0f766e', bg:'#f0fdfa'},
-  display:     {label:'Display',      emoji:'📟', color:'#db2777', bg:'#fdf2f8'},
-  fuentes:     {label:'Fuentes',      emoji:'🔋', color:'#16a34a', bg:'#f0fdf4'},
-  otro:        {label:'Otro',         emoji:'📦', color:'#6b7280', bg:'#f9fafb'},
+  // ── Electrónica ──
+  microcontroladores: {label:'Microcontroladores',  emoji:'🤖', color:'#2563eb', bg:'#eff6ff'},
+  modulos:            {label:'Módulos',              emoji:'📦', color:'#7c3aed', bg:'#f5f3ff'},
+  reguladores:        {label:'Reguladores voltaje',  emoji:'⚡', color:'#d97706', bg:'#fffbeb'},
+  diodos:             {label:'Diodos',               emoji:'🔺', color:'#dc2626', bg:'#fef2f2'},
+  transistores:       {label:'Transistores',         emoji:'🔷', color:'#0891b2', bg:'#ecfeff'},
+  capacitores:        {label:'Capacitores',          emoji:'🔵', color:'#16a34a', bg:'#f0fdf4'},
+  resistencias:       {label:'Resistencias',         emoji:'〰️', color:'#b45309', bg:'#fef9c3'},
+  leds:               {label:'LEDs',                 emoji:'💡', color:'#ea580c', bg:'#fff7ed'},
+  pulsadores:         {label:'Pulsadores/Botones',   emoji:'🔘', color:'#7c3aed', bg:'#f5f3ff'},
+  display:            {label:'Display/Pantallas',    emoji:'📟', color:'#db2777', bg:'#fdf2f8'},
+  fuentes:            {label:'Fuentes de Poder',     emoji:'🔋', color:'#0f766e', bg:'#f0fdfa'},
+  motores:            {label:'Motores',               emoji:'⚙️', color:'#6b7280', bg:'#f9fafb'},
+  plc:                {label:'PLC y Control',         emoji:'🖥️', color:'#1d4ed8', bg:'#dbeafe'},
+  sensores:           {label:'Sensores',              emoji:'📡', color:'#0f766e', bg:'#f0fdfa'},
+  baquelita:          {label:'Baquelita/PCB',         emoji:'🟫', color:'#92400e', bg:'#fef3c7'},
+  monedero:           {label:'Monedero',              emoji:'🪙', color:'#16a34a', bg:'#f0fdf4'},
+  bombas:             {label:'Bombas',                emoji:'💧', color:'#0891b2', bg:'#ecfeff'},
+  // ── Materiales físicos ──
+  cables:             {label:'Cables',                emoji:'🔌', color:'#b45309', bg:'#fef9c3'},
+  remaches:           {label:'Remaches/Tornillería',  emoji:'🔩', color:'#6b7280', bg:'#f9fafb'},
+  taype:              {label:'Taype/Cinta',            emoji:'🎗️', color:'#dc2626', bg:'#fef2f2'},
+  amarras:            {label:'Amarras',                emoji:'🪢', color:'#0891b2', bg:'#ecfeff'},
+  espiral:            {label:'Espiral cables',         emoji:'🌀', color:'#7c3aed', bg:'#f5f3ff'},
+  llantas:            {label:'Llantas/Ruedas',         emoji:'⚫', color:'#1a1a1a', bg:'#f3f4f6'},
+  enchufe:            {label:'Enchufes',               emoji:'🔌', color:'#16a34a', bg:'#f0fdf4'},
+  manguera:           {label:'Manguera',               emoji:'🟢', color:'#16a34a', bg:'#f0fdf4'},
+  estructura:         {label:'Estructura/Chapa',       emoji:'🔧', color:'#6b7280', bg:'#f9fafb'},
+  otro:               {label:'Otro',                   emoji:'📦', color:'#94a3b8', bg:'#f8fafc'},
 };
 
 let maquinas=[], materiales=[], movimientos=[];
