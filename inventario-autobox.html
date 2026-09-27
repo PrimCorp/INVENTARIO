@@ -102,6 +102,13 @@ table.data-table{width:100%;border-collapse:collapse;}
 .icon-btn.sub:hover{background:var(--bad-bg);color:var(--bad);border-color:var(--bad);}
 .icon-btn.del:hover{background:var(--bad-bg);color:var(--bad);border-color:var(--bad);}
 .empty-cell{text-align:center;color:var(--text-3);padding:32px 20px;font-size:.85rem;}
+.section-title{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;margin:22px 0 10px;}
+.section-title:first-of-type{margin-top:0;}
+.section-count{font-family:var(--font-mono);font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:50px;}
+.section-count.bad{background:var(--bad-bg);color:var(--bad);}
+.section-count.warn{background:var(--warn-bg);color:var(--warn);}
+.nav-badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:50px;background:var(--bad);color:#fff;font-family:var(--font-mono);font-size:.64rem;font-weight:700;text-align:center;line-height:16px;}
+.nav-badge:empty{display:none;}
 
 @media(max-width:760px){
   table.data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr{display:block;}
@@ -182,6 +189,7 @@ table.data-table{width:100%;border-collapse:collapse;}
       <button class="nav-item active" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
       <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')">Materiales</button>
       <button class="nav-item" id="tab-movimientos" onclick="switchTab('movimientos')">Movimientos</button>
+      <button class="nav-item" id="tab-alertas" onclick="switchTab('alertas')">Stock crítico<span class="nav-badge" id="al-badge"></span></button>
     </nav>
     <div class="sidebar-stats">
       <div class="stat-group active" id="stats-maquinas">
@@ -204,6 +212,13 @@ table.data-table{width:100%;border-collapse:collapse;}
         <div class="stat-row"><span>Entradas</span><b class="mono" id="mv-entradas">0</b></div>
         <div class="stat-row"><span>Salidas</span><b class="mono bad" id="mv-salidas">0</b></div>
         <div class="stat-row"><span>Este mes</span><b class="mono warn" id="mv-mes">0</b></div>
+      </div>
+      <div class="stat-group" id="stats-alertas">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Sin stock (0)</span><b class="mono bad" id="al-cero">0</b></div>
+        <div class="stat-row"><span>Muy bajo (1–2)</span><b class="mono warn" id="al-bajo">0</b></div>
+        <div class="stat-row"><span>Máquinas</span><b class="mono" id="al-mq">0</b></div>
+        <div class="stat-row"><span>Materiales</span><b class="mono" id="al-mt">0</b></div>
       </div>
     </div>
     <div class="sidebar-sync">
@@ -279,6 +294,41 @@ table.data-table{width:100%;border-collapse:collapse;}
         </table>
       </div>
       <button class="btn-secondary" onclick="exportarExcel('movimientos')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar a Excel</button>
+    </div>
+
+    <!-- ═══ STOCK CRÍTICO ═══ -->
+    <div class="tab-panel" id="panel-alertas">
+      <div class="content-header">
+        <h1>Stock crítico</h1>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input type="text" id="al-search" placeholder="Buscar ítem…" oninput="renderAlertas()">
+        </div>
+        <select class="sel" id="al-filters" onchange="renderAlertas()">
+          <option value="all">Máquinas y materiales</option>
+          <option value="maquina">Solo máquinas</option>
+          <option value="material">Solo materiales</option>
+        </select>
+      </div>
+
+      <div class="section-title">Sin stock <span class="section-count bad" id="al-cero-count">0</span></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th>Unidad</th><th></th></tr></thead>
+          <tbody id="al-cero-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Stock muy bajo (1–2) <span class="section-count warn" id="al-bajo-count">0</span></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th>Unidad</th><th></th></tr></thead>
+          <tbody id="al-bajo-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+      <button class="btn-secondary" onclick="exportarExcel('alertas')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar a Excel</button>
     </div>
 
   </main>
@@ -562,7 +612,7 @@ function getMesMov(m){
 }
 
 // ── RENDER ────────────────────────────────────────────────
-function render(){renderMaquinas();renderMateriales();renderMovimientos();}
+function render(){renderMaquinas();renderMateriales();renderMovimientos();renderAlertas();}
 
 function renderKpiItems(items,prefix){
   const bajo=items.filter(i=>i.stock>0&&i.stock<=i.stock_minimo).length;
@@ -670,6 +720,66 @@ function renderMovimientos(){
       '<td data-label="Cantidad" class="num" style="color:'+(esEntrada?'var(--ok)':'var(--bad)')+';">'+(esEntrada?'+':'')+m.delta+'</td>'+
     '</tr>';
   }).join('');
+}
+
+// ── STOCK CRÍTICO ────────────────────────────────────────
+const STOCK_MUY_BAJO=2;
+
+function getAlertas(){
+  const todos=[
+    ...maquinas.map(i=>({...i,tipo:'maquina'})),
+    ...materiales.map(i=>({...i,tipo:'material'})),
+  ];
+  const byName=(a,b)=>a.nombre.localeCompare(b.nombre);
+  const cero=todos.filter(i=>Number(i.stock)<=0).sort(byName);
+  const bajo=todos.filter(i=>Number(i.stock)>0&&Number(i.stock)<=STOCK_MUY_BAJO)
+    .sort((a,b)=>Number(a.stock)-Number(b.stock)||byName(a,b));
+  return {cero,bajo};
+}
+
+function renderAlertaRows(items,listId,msgVacio){
+  const el=document.getElementById(listId);
+  if(!items.length){
+    el.innerHTML='<tr><td colspan="6" class="empty-cell">'+msgVacio+'</td></tr>';
+    return;
+  }
+  el.innerHTML=items.map(item=>{
+    const cats=item.tipo==='maquina'?CATS_MQ:CATS_MT;
+    const c=cats[item.categoria]||{label:item.categoria};
+    const color=Number(item.stock)<=0?'var(--bad)':'var(--warn)';
+    return '<tr>'+
+      '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
+      '<td data-label="Tipo">'+(item.tipo==='maquina'?'Máquina':'Material')+'</td>'+
+      '<td data-label="Categoría">'+c.label+'</td>'+
+      '<td data-label="Stock" class="num" style="color:'+color+';">'+item.stock+'</td>'+
+      '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
+      '<td class="actions" data-label="">'+
+        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+item.tipo+'\',\'entrada\',\''+escHtml(item.nombre)+'\')">'+ICON_UP+'</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderAlertas(){
+  const {cero,bajo}=getAlertas();
+  const todos=cero.concat(bajo);
+  document.getElementById('al-cero').textContent=cero.length;
+  document.getElementById('al-bajo').textContent=bajo.length;
+  document.getElementById('al-mq').textContent=todos.filter(i=>i.tipo==='maquina').length;
+  document.getElementById('al-mt').textContent=todos.filter(i=>i.tipo==='material').length;
+  document.getElementById('al-badge').textContent=todos.length||'';
+
+  const q=(document.getElementById('al-search').value||'').toLowerCase();
+  const f=document.getElementById('al-filters').value;
+  const filtrar=list=>list.filter(i=>
+    (f==='all'||i.tipo===f)&&
+    (!q||i.nombre.toLowerCase().includes(q)||(i.nota||'').toLowerCase().includes(q))
+  );
+  const ceroF=filtrar(cero), bajoF=filtrar(bajo);
+  document.getElementById('al-cero-count').textContent=ceroF.length;
+  document.getElementById('al-bajo-count').textContent=bajoF.length;
+  renderAlertaRows(ceroF,'al-cero-list','Ningún ítem sin stock 👍');
+  renderAlertaRows(bajoF,'al-bajo-list','Ningún ítem con stock muy bajo 👍');
 }
 
 // ── ACCIONES ─────────────────────────────────────────────
@@ -788,7 +898,7 @@ function setFiltroMov(f){
 }
 
 function switchTab(tab){
-  ['maquinas','materiales','movimientos'].forEach(t=>{
+  ['maquinas','materiales','movimientos','alertas'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('stats-'+t).classList.toggle('active',t===tab);
@@ -833,6 +943,19 @@ function exportarExcel(tipo){
     wsD['!cols']=[{wch:36},{wch:16},{wch:10},{wch:10},{wch:10},{wch:28},{wch:14}];
     XLSX.utils.book_append_sheet(wb,wsD,nombre);
     XLSX.writeFile(wb,'AUTOBOX_Inventario_'+nombre+'_'+fecha.replace(/\//g,'-')+'.xlsx');
+  } else if(tipo==='alertas'){
+    const {cero,bajo}=getAlertas();
+    if(!cero.length&&!bajo.length){toast('No hay ítems con stock crítico','error');return;}
+    const fila=i=>[i.nombre,i.tipo==='maquina'?'Máquina':'Material',((i.tipo==='maquina'?CATS_MQ:CATS_MT)[i.categoria]||{label:i.categoria}).label,i.stock,i.unidad||'unidad',i.nota||''];
+    const cab=['Nombre','Tipo','Categoría','Stock','Unidad','Nota'];
+    const det=[['STOCK CRÍTICO AUTOBOX'],['Exportado:',fecha],[],['SIN STOCK ('+cero.length+')'],cab];
+    cero.forEach(i=>det.push(fila(i)));
+    det.push([],['STOCK MUY BAJO 1–2 ('+bajo.length+')'],cab);
+    bajo.forEach(i=>det.push(fila(i)));
+    const ws=XLSX.utils.aoa_to_sheet(det);
+    ws['!cols']=[{wch:36},{wch:12},{wch:20},{wch:8},{wch:10},{wch:28}];
+    XLSX.utils.book_append_sheet(wb,ws,'Stock crítico');
+    XLSX.writeFile(wb,'AUTOBOX_Stock_Critico_'+fecha.replace(/\//g,'-')+'.xlsx');
   } else {
     if(!movimientos.length){toast('No hay movimientos','error');return;}
     const det=[['MOVIMIENTOS AUTOBOX'],[],['Fecha','Tipo','Ítem','Delta','Motivo','Usuario']];
