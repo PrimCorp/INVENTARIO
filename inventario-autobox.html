@@ -156,6 +156,61 @@ table.data-table{width:100%;border-collapse:collapse;}
 .modal-btn.confirm{background:var(--accent);color:var(--accent-contrast);}
 .modal-btn.cancel{background:var(--bg);color:var(--text-2);border:1px solid var(--border);}
 
+/* KÁRDEX */
+.icon-btn.kx:hover{background:var(--bg);color:var(--accent);border-color:var(--accent);}
+.modal-box.wide{max-width:1000px;max-height:90vh;overflow-y:auto;}
+.kx-sub{font-size:.78rem;color:var(--text-2);margin:-8px 0 14px;}
+.kx-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.kx-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;}
+.kx-card span{display:block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);}
+.kx-card b{font-family:var(--font-mono);font-size:1.02rem;}
+.kx-warn{background:var(--warn-bg);color:var(--warn);border-radius:var(--radius-sm);padding:8px 12px;font-size:.76rem;font-weight:600;margin-bottom:12px;}
+.kx-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);}
+table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78rem;}
+.kx-table th{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:7px 9px;background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;text-align:right;}
+.kx-table th.l,.kx-table td.l{text-align:left;}
+.kx-table thead tr:first-child th{text-align:center;border-left:1px solid var(--border);}
+.kx-table thead tr:first-child th:first-child{border-left:none;}
+.kx-table th.g,.kx-table td.g{border-left:1px solid var(--border);}
+.kx-table td{padding:7px 9px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);white-space:nowrap;}
+.kx-table td.l{font-family:var(--font-ui);}
+.kx-table tbody tr:last-child td{border-bottom:none;}
+.kx-table td.in{color:var(--ok);}
+.kx-table td.out{color:var(--bad);}
+.kx-table td.saldo{font-weight:700;}
+.kx-flag{display:inline-block;margin-left:5px;padding:0 5px;border-radius:50px;background:var(--warn-bg);color:var(--warn);font-size:.6rem;font-weight:700;font-family:var(--font-ui);}
+.modal-hint{font-size:.74rem;color:var(--text-3);margin:-4px 0 12px;}
+@media(max-width:600px){.kx-summary{grid-template-columns:1fr;}}
+
+/* PRODUCCIÓN / RECETAS */
+.kx-table.narrow{min-width:560px;}
+.kx-table tr.falta td{background:var(--bad-bg);}
+.icon-btn.fab:hover{background:var(--ok-bg);color:var(--ok);border-color:var(--ok);}
+.btn-sm{padding:5px 10px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);color:var(--text-2);font-weight:600;font-size:.74rem;cursor:pointer;margin-left:4px;white-space:nowrap;}
+.btn-sm:hover{background:var(--bg);color:var(--text);}
+.btn-sm.primary{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent);}
+.btn-sm.primary:hover{filter:brightness(1.08);}
+.btn-sm:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+.rc-line{display:grid;grid-template-columns:1fr 96px 60px 26px;gap:8px;align-items:center;margin-bottom:8px;}
+.rc-head{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:6px;}
+.rc-line select,.rc-line input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:.82rem;outline:none;}
+.rc-line select{-webkit-appearance:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.rc-line input{font-family:var(--font-mono);text-align:right;}
+.rc-line select:focus,.rc-line input:focus{border-color:var(--accent);}
+.rc-line .icon-btn{margin-left:0;}
+.rc-unit{font-size:.74rem;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;}
+.rc-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:14px 0 10px;padding-top:12px;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-2);}
+.rc-total b{font-size:1rem;color:var(--text);}
+.kx-info{background:var(--bg);border:1px solid var(--border);color:var(--text-2);border-radius:var(--radius-sm);padding:8px 12px;font-size:.76rem;margin-bottom:12px;}
+.kx-warn.bad{background:var(--bad-bg);color:var(--bad);}
+.kx-warn .btn-sm{margin-left:8px;}
+.fab-progress{font-family:var(--font-mono);font-size:.76rem;color:var(--text-2);margin-bottom:8px;}
+.fab-progress:empty{display:none;}
+@media(max-width:600px){
+  .rc-line{grid-template-columns:1fr 72px 26px;}
+  .rc-unit{display:none;}
+}
+
 /* MOBILE SHELL */
 .mobile-topbar{display:none;}
 @media(max-width:900px){
@@ -188,6 +243,7 @@ table.data-table{width:100%;border-collapse:collapse;}
     <nav class="sidebar-nav">
       <button class="nav-item active" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
       <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')">Materiales</button>
+      <button class="nav-item" id="tab-produccion" onclick="switchTab('produccion')">Producción<span class="nav-badge" id="pr-badge"></span></button>
       <button class="nav-item" id="tab-movimientos" onclick="switchTab('movimientos')">Movimientos</button>
       <button class="nav-item" id="tab-alertas" onclick="switchTab('alertas')">Stock crítico<span class="nav-badge" id="al-badge"></span></button>
     </nav>
@@ -198,6 +254,7 @@ table.data-table{width:100%;border-collapse:collapse;}
         <div class="stat-row"><span>Stock total</span><b class="mono" id="mq-stock">0</b></div>
         <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="mq-bajo">0</b></div>
         <div class="stat-row"><span>Sin stock</span><b class="mono bad" id="mq-cero">0</b></div>
+        <div class="stat-row"><span>Valor (kárdex)</span><b class="mono" id="mq-valor">$0.00</b></div>
       </div>
       <div class="stat-group" id="stats-materiales">
         <div class="stat-title">Resumen</div>
@@ -205,6 +262,14 @@ table.data-table{width:100%;border-collapse:collapse;}
         <div class="stat-row"><span>Stock total</span><b class="mono" id="mt-stock">0</b></div>
         <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="mt-bajo">0</b></div>
         <div class="stat-row"><span>Sin stock</span><b class="mono bad" id="mt-cero">0</b></div>
+        <div class="stat-row"><span>Valor (kárdex)</span><b class="mono" id="mt-valor">$0.00</b></div>
+      </div>
+      <div class="stat-group" id="stats-produccion">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Con receta</span><b class="mono" id="pr-con">0</b></div>
+        <div class="stat-row"><span>Sin receta</span><b class="mono warn" id="pr-sin">0</b></div>
+        <div class="stat-row"><span>Se pueden armar</span><b class="mono" id="pr-armables">0</b></div>
+        <div class="stat-row"><span>Sin componentes</span><b class="mono bad" id="pr-bloq">0</b></div>
       </div>
       <div class="stat-group" id="stats-movimientos">
         <div class="stat-title">Resumen</div>
@@ -271,6 +336,21 @@ table.data-table{width:100%;border-collapse:collapse;}
         </table>
       </div>
       <button class="btn-secondary" onclick="exportarExcel('material')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar a Excel</button>
+    </div>
+
+    <!-- ═══ PRODUCCIÓN ═══ -->
+    <div class="tab-panel" id="panel-produccion">
+      <div class="content-header">
+        <h1>Producción</h1>
+      </div>
+      <div class="kx-sub" style="margin:-6px 0 14px;">Cada máquina tiene su receta: los componentes que lleva <b>una</b> unidad. Al fabricar se descuentan del stock de materiales y se suma la máquina, con su costo según el kárdex.</div>
+      <div id="pr-banners"></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Máquina</th><th class="num">Componentes</th><th class="num">Costo por máquina</th><th class="num">Se pueden armar</th><th class="num">En stock</th><th></th></tr></thead>
+          <tbody id="pr-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- ═══ MOVIMIENTOS ═══ -->
@@ -373,6 +453,10 @@ table.data-table{width:100%;border-collapse:collapse;}
         </div>
       </div>
       <div class="field">
+        <label>Costo unitario ($) del stock inicial</label>
+        <input type="number" id="mq-costo" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/>
+      </div>
+      <div class="field">
         <label>Nota (opcional)</label>
         <input type="text" id="mq-nota" placeholder="Color, variante, precio referencial…" maxlength="100"/>
       </div>
@@ -421,6 +505,9 @@ table.data-table{width:100%;border-collapse:collapse;}
               <option value="enchufe">🔌 Enchufes</option>
               <option value="manguera">🟢 Manguera</option>
               <option value="estructura">🔧 Estructura / Chapa</option>
+              <option value="borneras">🔗 Borneras</option>
+              <option value="cajas">🗃️ Cajas / Recipientes</option>
+              <option value="cerraduras">🔑 Llaves / Cerraduras</option>
               <option value="otro">📦 Otro</option>
             </optgroup>
           </select>
@@ -446,6 +533,10 @@ table.data-table{width:100%;border-collapse:collapse;}
             <option value="set">set</option>
           </select>
         </div>
+      </div>
+      <div class="field">
+        <label>Costo unitario ($) del stock inicial</label>
+        <input type="number" id="mt-costo" placeholder="0.00" min="0" step="0.0001" inputmode="decimal"/>
       </div>
       <div class="field">
         <label>Nota (opcional)</label>
@@ -477,6 +568,11 @@ table.data-table{width:100%;border-collapse:collapse;}
         </select>
       </div>
     </div>
+    <div class="field" id="modal-costo-wrap" style="margin-bottom:12px;">
+      <label>Costo unitario ($)</label>
+      <input type="number" class="modal-input" id="modal-costo" placeholder="0.00" min="0" step="0.0001" inputmode="decimal"/>
+    </div>
+    <div class="modal-hint" id="modal-costo-hint"></div>
     <div class="field" style="margin-bottom:12px;">
       <label>Registrado por</label>
       <select class="modal-input" id="modal-usuario" style="text-align:left;font-family:var(--font-ui);font-size:0.86rem;font-weight:500;text-transform:none;">
@@ -491,12 +587,87 @@ table.data-table{width:100%;border-collapse:collapse;}
   </div>
 </div>
 
+<!-- MODAL RECETA -->
+<div class="modal-overlay" id="modal-rc" hidden onclick="if(event.target===this)cerrarReceta()">
+  <div class="modal-box wide" style="max-width:720px;">
+    <div class="modal-head"><div class="modal-title" id="rc-title">Receta</div><button class="modal-close" onclick="cerrarReceta()">×</button></div>
+    <div class="kx-sub">Componentes de <b>una</b> máquina. La cantidad va en la unidad de cada material (ej. cable en metros, borneras en pares).</div>
+    <div class="toolbar"><select class="sel" id="rc-copiar" style="flex:1 1 auto;" onchange="copiarReceta(this.value)"></select></div>
+    <div class="rc-line rc-head"><span>Componente</span><span style="text-align:right;">Cantidad</span><span></span><span></span></div>
+    <div id="rc-lines"></div>
+    <button class="btn-sm" style="margin:4px 0 0;" onclick="agregarLineaReceta()">+ Agregar componente</button>
+    <div class="rc-total"><span>Costo estimado por máquina (promedio del kárdex)</span><b class="mono" id="rc-total">$0.00</b></div>
+    <button class="btn-primary" id="btn-rc" onclick="guardarReceta()">Guardar receta</button>
+  </div>
+</div>
+
+<!-- MODAL FABRICAR -->
+<div class="modal-overlay" id="modal-fab" hidden onclick="if(event.target===this&&!fabOcupado)cerrarFabricar()">
+  <div class="modal-box wide" style="max-width:780px;">
+    <div class="modal-head"><div class="modal-title" id="fab-title">Fabricar</div><button class="modal-close" onclick="cerrarFabricar()">×</button></div>
+    <div class="form-row">
+      <div class="field">
+        <label>Máquinas terminadas</label>
+        <input type="number" id="fab-qty" value="1" min="1" step="1" inputmode="numeric" oninput="renderFabricar()"/>
+      </div>
+      <div class="field">
+        <label>Registrado por</label>
+        <select id="fab-usuario">
+          <option value="Danny">👤 Danny</option>
+          <option value="Tatiana">👤 Tatiana</option>
+        </select>
+      </div>
+    </div>
+    <div id="fab-warns"></div>
+    <div class="kx-scroll">
+      <table class="kx-table narrow">
+        <thead><tr><th class="l">Componente</th><th>Por máquina</th><th>Se descuenta</th><th>En stock</th><th>Queda</th><th>Costo</th></tr></thead>
+        <tbody id="fab-list"></tbody>
+      </table>
+    </div>
+    <div class="rc-total"><span>Costo por máquina</span><b class="mono" id="fab-costo">$0.00</b></div>
+    <div class="fab-progress" id="fab-progress"></div>
+    <button class="btn-primary" id="btn-fab" onclick="confirmarFabricacion()">Descontar componentes y sumar máquina</button>
+  </div>
+</div>
+
+<!-- MODAL KÁRDEX -->
+<div class="modal-overlay" id="modal-kx" hidden onclick="if(event.target===this)cerrarKardex()">
+  <div class="modal-box wide">
+    <div class="modal-head"><div class="modal-title" id="kx-title">Kárdex</div><button class="modal-close" onclick="cerrarKardex()">×</button></div>
+    <div class="kx-sub">Método: costo promedio ponderado</div>
+    <div class="kx-summary">
+      <div class="kx-card"><span>Saldo (cantidad)</span><b id="kx-q">0</b></div>
+      <div class="kx-card"><span>Costo promedio</span><b id="kx-prom">$0.00</b></div>
+      <div class="kx-card"><span>Valor del saldo</span><b id="kx-valor">$0.00</b></div>
+    </div>
+    <div id="kx-warns"></div>
+    <div class="kx-scroll">
+      <table class="kx-table">
+        <thead>
+          <tr><th class="l" colspan="3"></th><th colspan="3">Entradas</th><th colspan="3">Salidas</th><th colspan="3">Saldo</th></tr>
+          <tr><th class="l">Fecha</th><th class="l">Detalle</th><th class="l">Usuario</th>
+            <th class="g">Cant.</th><th>C. unit.</th><th>Total</th>
+            <th class="g">Cant.</th><th>C. unit.</th><th>Total</th>
+            <th class="g">Cant.</th><th>C. prom.</th><th>Valor</th></tr>
+        </thead>
+        <tbody id="kx-list"></tbody>
+      </table>
+    </div>
+    <button class="btn-secondary" onclick="exportarKardex()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar kárdex a Excel</button>
+  </div>
+</div>
+
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGQ_Uzova6QNWz-gT57ZTyUcwV3PcDonM4W83eiwJbSkHPEMi-IVkfgWlJU-q152fW/exec';
 
 const ICON_UP='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
 const ICON_DOWN='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
 const ICON_TRASH='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-.867 12.142A2 2 0 0 1 16.138 20H7.862a2 2 0 0 1-1.995-1.858L5 6"/></svg>';
+
+const ICON_KX='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>';
+
+const ICON_FAB='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
 
 const CATS_MQ = {
   mini:      {label:'MINI'},
@@ -532,6 +703,9 @@ const CATS_MT = {
   enchufe:            {label:'Enchufes'},
   manguera:           {label:'Manguera'},
   estructura:         {label:'Estructura/Chapa'},
+  borneras:           {label:'Borneras'},
+  cajas:              {label:'Cajas/Recipientes'},
+  cerraduras:         {label:'Llaves/Cerraduras'},
   otro:               {label:'Otro'},
 };
 
@@ -545,31 +719,26 @@ function setSyncStatus(state,msg){
   document.getElementById('sync-txt').textContent=msg;
 }
 
-function jsonpGet(params){
+// onerror solo salta con fallas de red; si Apps Script responde una página de error el callback
+// nunca llega, por eso el tiempo límite. Las respuestas {error} u {ok:false} se tratan como fallo.
+function jsonp(params,timeoutMs=20000){
   return new Promise((resolve,reject)=>{
-    const uid='_jget_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const cb='jg_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    window[cb]=function(d){delete window[cb];const el=document.getElementById(uid);if(el)el.remove();resolve(d);};
-    const s=document.createElement('script');s.id=uid;
+    const cb='jp_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const timer=setTimeout(()=>{window[cb]=()=>{delete window[cb];};s.remove();reject(new Error('Tiempo de espera agotado'));},timeoutMs);
+    const limpiar=()=>{clearTimeout(timer);delete window[cb];s.remove();};
+    window[cb]=function(d){
+      limpiar();
+      if(d&&typeof d==='object'&&!Array.isArray(d)&&(d.error||d.ok===false))reject(new Error(d.error||'Error del servidor'));
+      else resolve(d);
+    };
+    s.onerror=()=>{limpiar();reject(new Error('Error de red'));};
     const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
     s.src=SCRIPT_URL+'?'+qs;
-    s.onerror=()=>{delete window[cb];const el=document.getElementById(uid);if(el)el.remove();reject(new Error('Error de red'));};
     document.head.appendChild(s);
   });
 }
-
-function jsonpAction(params){
-  return new Promise((resolve,reject)=>{
-    const uid='_jact_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const cb='ja_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    window[cb]=function(d){delete window[cb];const el=document.getElementById(uid);if(el)el.remove();resolve(d);};
-    const s=document.createElement('script');s.id=uid;
-    const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
-    s.src=SCRIPT_URL+'?'+qs;
-    s.onerror=()=>{delete window[cb];const el=document.getElementById(uid);if(el)el.remove();reject(new Error('Error de red'));};
-    document.head.appendChild(s);
-  });
-}
+const jsonpGet=jsonp, jsonpAction=jsonp;
 
 async function cargarTodo(){
   setSyncStatus('loading','Cargando…');
@@ -611,8 +780,454 @@ function getMesMov(m){
   return false;
 }
 
+function fmtMoney(n){return '$'+Number(n||0).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});}
+// Costos unitarios con hasta 4 decimales (resistencias, capacitores… cuestan centavos)
+function fmtCosto(n){return '$'+Number(n||0).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:4});}
+function fechaHoy(){
+  const d=new Date();
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function costoValido(v){return v!==''&&v!==null&&v!==undefined&&!isNaN(Number(v))&&Number(v)>=0;}
+
+// ── KÁRDEX (costo promedio ponderado) ────────────────────
+const MOTIVOS={compra:'Compra',devolucion:'Devolución',ajuste:'Ajuste de inventario',venta:'Venta',uso_produccion:'Uso en producción',dano:'Daño/Pérdida',produccion:'Fabricación'};
+
+// Recorre los movimientos en orden cronológico (orden de la hoja) y arma el kárdex de cada ítem.
+// Entrada: suma cantidad y valor, recalcula el promedio. Si no trae costo, entra al promedio vigente.
+// Salida: sale al costo promedio vigente; el promedio no cambia.
+function calcKardexAll(){
+  const map={};
+  movimientos.forEach(m=>{
+    const key=m.tipo+':'+String(m.item_id);
+    const k=map[key]||(map[key]={rows:[],q:0,v:0,prom:0,sinCosto:0,negativo:false});
+    const delta=Number(m.delta)||0;
+    if(!delta)return;
+    const row={fecha:m.fecha||'—',motivo:MOTIVOS[m.motivo]||m.motivo||'—',usuario:m.usuario||'—'};
+    if(delta>0){
+      const tieneCosto=costoValido(m.costo_unitario);
+      const cu=tieneCosto?Number(m.costo_unitario):k.prom;
+      if(!tieneCosto)k.sinCosto++;
+      k.q+=delta;k.v+=delta*cu;
+      k.prom=k.q>0?k.v/k.q:cu;
+      Object.assign(row,{inQ:delta,inCu:cu,inT:delta*cu,sinCosto:!tieneCosto});
+    }else{
+      const q=-delta,cu=k.prom;
+      k.q-=q;
+      if(k.q<0)k.negativo=true;
+      k.v=k.q>0?k.q*k.prom:0;
+      Object.assign(row,{outQ:q,outCu:cu,outT:q*cu});
+    }
+    Object.assign(row,{q:k.q,prom:k.prom,v:k.v});
+    k.rows.push(row);
+  });
+  return map;
+}
+let kardexCache={};
+function getKardex(tipo,id){return kardexCache[tipo+':'+String(id)]||{rows:[],q:0,v:0,prom:0,sinCosto:0,negativo:false};}
+
+let kardexAbierto=null;
+function abrirKardex(id,tipo){
+  const lista=tipo==='maquina'?maquinas:materiales;
+  const item=lista.find(i=>String(i.id)===String(id));
+  if(!item)return;
+  kardexAbierto={id,tipo};
+  const k=getKardex(tipo,id);
+  document.getElementById('kx-title').textContent='Kárdex · '+item.nombre;
+  document.getElementById('kx-q').textContent=k.q+' '+(item.unidad||'unidad');
+  document.getElementById('kx-prom').textContent=fmtCosto(k.prom);
+  document.getElementById('kx-valor').textContent=fmtMoney(k.v);
+
+  const warns=[];
+  if(k.sinCosto)warns.push(k.sinCosto+' entrada(s) sin costo registrado: se valoraron al costo promedio de ese momento.');
+  if(k.rows.length&&k.q!==Number(item.stock))warns.push('El saldo del kárdex ('+k.q+') no coincide con el stock actual ('+item.stock+'). Puede haber movimientos que no se registraron o un stock inicial sin movimiento.');
+  if(!k.rows.length&&Number(item.stock)>0)warns.push('Este ítem tiene stock ('+item.stock+') pero no tiene movimientos registrados. Registra una entrada de "Ajuste" con su costo para iniciar el kárdex.');
+  if(k.negativo)warns.push('En algún momento salió más de lo que había en saldo.');
+  document.getElementById('kx-warns').innerHTML=warns.map(w=>'<div class="kx-warn">'+escHtml(w)+'</div>').join('');
+
+  const el=document.getElementById('kx-list');
+  if(!k.rows.length){
+    el.innerHTML='<tr><td colspan="12" class="l" style="text-align:center;color:var(--text-3);padding:24px;">Sin movimientos</td></tr>';
+  }else{
+    const n=v=>v===undefined?'':v;
+    el.innerHTML=k.rows.map(r=>'<tr>'+
+      '<td class="l">'+escHtml(r.fecha)+'</td>'+
+      '<td class="l">'+escHtml(r.motivo)+(r.sinCosto?'<span class="kx-flag">sin costo</span>':'')+'</td>'+
+      '<td class="l">'+escHtml(r.usuario)+'</td>'+
+      '<td class="g in">'+n(r.inQ)+'</td><td class="in">'+(r.inQ?fmtCosto(r.inCu):'')+'</td><td class="in">'+(r.inQ?fmtMoney(r.inT):'')+'</td>'+
+      '<td class="g out">'+n(r.outQ)+'</td><td class="out">'+(r.outQ?fmtCosto(r.outCu):'')+'</td><td class="out">'+(r.outQ?fmtMoney(r.outT):'')+'</td>'+
+      '<td class="g saldo">'+r.q+'</td><td>'+fmtCosto(r.prom)+'</td><td class="saldo">'+fmtMoney(r.v)+'</td>'+
+    '</tr>').join('');
+  }
+  document.getElementById('modal-kx').hidden=false;
+}
+function cerrarKardex(){document.getElementById('modal-kx').hidden=true;kardexAbierto=null;}
+
+function exportarKardex(){
+  if(!kardexAbierto)return;
+  const {id,tipo}=kardexAbierto;
+  const item=(tipo==='maquina'?maquinas:materiales).find(i=>String(i.id)===String(id));
+  if(!item)return;
+  const k=getKardex(tipo,id);
+  if(!k.rows.length){toast('Este ítem no tiene movimientos','error');return;}
+  const r2=v=>Math.round(v*100)/100, r4=v=>Math.round(v*10000)/10000;
+  const fecha=new Date().toLocaleDateString('es-EC');
+  const det=[
+    ['KÁRDEX AUTOBOX - '+item.nombre],
+    ['Método:','Costo promedio ponderado'],['Unidad:',item.unidad||'unidad'],['Exportado:',fecha],[],
+    ['','','','ENTRADAS','','','SALIDAS','','','SALDO'],
+    ['Fecha','Detalle','Usuario','Cant.','C. unit.','Total','Cant.','C. unit.','Total','Cant.','C. prom.','Valor'],
+  ];
+  k.rows.forEach(r=>det.push([
+    r.fecha,r.motivo+(r.sinCosto?' (sin costo)':''),r.usuario,
+    r.inQ??'',r.inQ?r4(r.inCu):'',r.inQ?r2(r.inT):'',
+    r.outQ??'',r.outQ?r4(r.outCu):'',r.outQ?r2(r.outT):'',
+    r.q,r4(r.prom),r2(r.v),
+  ]));
+  const ws=XLSX.utils.aoa_to_sheet(det);
+  ws['!cols']=[{wch:12},{wch:24},{wch:10},{wch:8},{wch:10},{wch:11},{wch:8},{wch:10},{wch:11},{wch:8},{wch:10},{wch:12}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Kárdex');
+  const nom=item.nombre.replace(/[^A-Z0-9ÁÉÍÓÚÑ ]/gi,'').trim().replace(/\s+/g,'_').slice(0,40);
+  XLSX.writeFile(wb,'AUTOBOX_Kardex_'+nom+'_'+fecha.replace(/\//g,'-')+'.xlsx');
+  toast('Kárdex descargado ✓','success');
+}
+
+// ── RECETAS (lista de materiales por máquina) ────────────
+// recetas = { [maquina_id]: [{material_id, cantidad}] } — cantidad por UNA máquina.
+// Se guardan en la hoja "Recetas" vía Apps Script (get_recetas / save_receta).
+// Si el script aún no tiene esas acciones, quedan solo en este navegador (estado 'local').
+let recetas={}, recetasEstado='cargando';
+const r4=v=>Math.round(v*10000)/10000;
+function leerJSON(k,def){try{return JSON.parse(localStorage.getItem(k)||'')??def;}catch(e){return def;}}
+function getReceta(maquinaId){return recetas[String(maquinaId)]||[];}
+function getMaterial(id){return materiales.find(m=>String(m.id)===String(id));}
+function getMaquina(id){return maquinas.find(m=>String(m.id)===String(id));}
+
+async function cargarRecetas(){
+  const local=leerJSON('inv_rc',{});
+  try{
+    const d=await jsonp({action:'get_recetas'});
+    if(!(d&&d.ok===true&&Array.isArray(d.recetas)))throw Object.assign(new Error('sin soporte'),{sinSoporte:true});
+    const map={};
+    d.recetas.forEach(r=>{
+      const k=String(r.maquina_id);
+      (map[k]=map[k]||[]).push({material_id:String(r.material_id),cantidad:Number(r.cantidad)});
+    });
+    recetas=map;recetasEstado='servidor';
+    // Recetas creadas en este navegador antes de actualizar el Apps Script: se suben una sola vez.
+    if(!localStorage.getItem('inv_rc_migrado')){
+      for(const [k,lineas] of Object.entries(local)){
+        if(!map[k]&&lineas.length){
+          try{await jsonp({action:'save_receta',maquina_id:k,lineas:JSON.stringify(lineas)});recetas[k]=lineas;}catch(e){}
+        }
+      }
+      localStorage.setItem('inv_rc_migrado','1');
+    }
+  }catch(e){
+    recetas=local;
+    recetasEstado=e.message==='Error de red'||e.message==='Tiempo de espera agotado'?'offline':'local';
+  }
+  localStorage.setItem('inv_rc',JSON.stringify(recetas));
+  render();
+}
+
+// Cuántas máquinas se pueden armar con el stock actual de materiales
+function armables(receta){
+  if(!receta.length)return 0;
+  return Math.min(...receta.map(l=>{
+    const m=getMaterial(l.material_id);
+    return m?Math.floor((Number(m.stock)||0)/l.cantidad+1e-9):0;
+  }));
+}
+function costoReceta(receta){return receta.reduce((s,l)=>s+l.cantidad*getKardex('material',l.material_id).prom,0);}
+
+function renderProduccion(){
+  const pend=leerJSON('inv_fab_pend',[]);
+  const banners=[];
+  if(recetasEstado==='local')banners.push('<div class="kx-warn">Las recetas se están guardando <b>solo en este navegador</b>. Agrega el archivo <b>Recetas.gs</b> al Apps Script para que se compartan entre equipos.</div>');
+  if(recetasEstado==='offline')banners.push('<div class="kx-warn">Sin conexión: mostrando recetas guardadas en este navegador.</div>');
+  pend.forEach(l=>{
+    const faltan=l.lineas.filter(x=>x.paso!=='done').length;
+    banners.push('<div class="kx-warn bad">Fabricación incompleta: '+escHtml(l.maquina_nombre)+' ×'+l.n+' — '+faltan+' registro(s) sin guardar.'+
+      '<button class="btn-sm primary" onclick="reintentarLote(\''+l.id+'\')"'+(fabOcupado?' disabled':'')+'>Reintentar</button>'+
+      '<button class="btn-sm" onclick="descartarLote(\''+l.id+'\')"'+(fabOcupado?' disabled':'')+'>Descartar</button></div>');
+  });
+  document.getElementById('pr-banners').innerHTML=banners.join('');
+  document.getElementById('pr-badge').textContent=pend.length||'';
+
+  let con=0,sin=0,arm=0,bloq=0;
+  const el=document.getElementById('pr-list');
+  if(!maquinas.length){
+    el.innerHTML='<tr><td colspan="6" class="empty-cell">Primero crea las máquinas en la pestaña Máquinas</td></tr>';
+  }else{
+    el.innerHTML=[...maquinas].sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(mq=>{
+      const rc=getReceta(mq.id);
+      const tiene=rc.length>0;
+      const n=tiene?armables(rc):0;
+      if(tiene){con++;if(n>0)arm++;else bloq++;}else sin++;
+      const huerfanos=rc.filter(l=>!getMaterial(l.material_id)).length;
+      return '<tr>'+
+        '<td data-label="Máquina" class="cell-name">'+escHtml(mq.nombre)+
+          (huerfanos?'<span class="cell-note" style="color:var(--bad);">'+huerfanos+' componente(s) ya no existen en Materiales</span>':
+           !tiene?'<span class="cell-note">Sin receta</span>':'')+'</td>'+
+        '<td data-label="Componentes" class="num">'+(tiene?rc.length:'—')+'</td>'+
+        '<td data-label="Costo por máquina" class="num">'+(tiene?fmtMoney(costoReceta(rc)):'—')+'</td>'+
+        '<td data-label="Se pueden armar" class="num" style="color:'+(!tiene?'var(--text-3)':n>0?'var(--ok)':'var(--bad)')+';">'+(tiene?n:'—')+'</td>'+
+        '<td data-label="En stock" class="num">'+mq.stock+'</td>'+
+        '<td class="actions" data-label="">'+
+          '<button class="btn-sm" onclick="abrirReceta(\''+mq.id+'\')">'+(tiene?'Editar receta':'Crear receta')+'</button>'+
+          '<button class="btn-sm primary" onclick="abrirFabricar(\''+mq.id+'\')"'+(tiene?'':' disabled')+'>Fabricar</button>'+
+        '</td>'+
+      '</tr>';
+    }).join('');
+  }
+  document.getElementById('pr-con').textContent=con;
+  document.getElementById('pr-sin').textContent=sin;
+  document.getElementById('pr-armables').textContent=arm;
+  document.getElementById('pr-bloq').textContent=bloq;
+}
+
+// ── Editor de receta ──
+let rcEdit=null;
+function opcionesMateriales(sel){
+  const grupos={};
+  materiales.forEach(m=>{(grupos[m.categoria]=grupos[m.categoria]||[]).push(m);});
+  const cats=Object.keys(grupos).sort((a,b)=>(CATS_MT[a]||{label:a}).label.localeCompare((CATS_MT[b]||{label:b}).label));
+  return '<option value="">— Elegir material —</option>'+cats.map(c=>
+    '<optgroup label="'+escHtml((CATS_MT[c]||{label:c}).label)+'">'+
+    grupos[c].sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(m=>
+      '<option value="'+escHtml(m.id)+'"'+(String(m.id)===String(sel)?' selected':'')+'>'+escHtml(m.nombre)+' ('+m.stock+' '+escHtml(m.unidad||'unidad')+')</option>'
+    ).join('')+'</optgroup>'
+  ).join('');
+}
+function abrirReceta(maquinaId){
+  const mq=getMaquina(maquinaId);if(!mq)return;
+  if(!materiales.length){toast('Primero registra materiales','error');return;}
+  rcEdit={maquinaId:String(maquinaId),lineas:getReceta(maquinaId).map(l=>({...l}))};
+  if(!rcEdit.lineas.length)rcEdit.lineas.push({material_id:'',cantidad:1});
+  document.getElementById('rc-title').textContent='Receta · '+mq.nombre;
+  const otras=maquinas.filter(m=>String(m.id)!==String(maquinaId)&&getReceta(m.id).length);
+  const sel=document.getElementById('rc-copiar');
+  sel.innerHTML='<option value="">Copiar componentes de otra receta…</option>'+otras.map(m=>'<option value="'+escHtml(m.id)+'">'+escHtml(m.nombre)+' ('+getReceta(m.id).length+' componentes)</option>').join('');
+  sel.style.display=otras.length?'':'none';
+  renderReceta();
+  document.getElementById('modal-rc').hidden=false;
+}
+function cerrarReceta(){document.getElementById('modal-rc').hidden=true;rcEdit=null;}
+function renderReceta(){
+  document.getElementById('rc-lines').innerHTML=rcEdit.lineas.map((l,i)=>{
+    const m=getMaterial(l.material_id);
+    return '<div class="rc-line">'+
+      '<select onchange="rcSet('+i+',\'material_id\',this.value)">'+opcionesMateriales(l.material_id)+'</select>'+
+      '<input type="number" min="0" step="any" inputmode="decimal" value="'+escHtml(l.cantidad)+'" oninput="rcSet('+i+',\'cantidad\',this.value)"/>'+
+      '<span class="rc-unit" id="rc-unit-'+i+'">'+escHtml(m?(m.unidad||'unidad'):'')+'</span>'+
+      '<button class="icon-btn del" title="Quitar" onclick="quitarLineaReceta('+i+')">'+ICON_TRASH+'</button>'+
+    '</div>';
+  }).join('');
+  renderRecetaTotal();
+}
+function renderRecetaTotal(){
+  const validas=rcEdit.lineas.filter(l=>l.material_id&&Number(l.cantidad)>0).map(l=>({material_id:l.material_id,cantidad:Number(l.cantidad)}));
+  document.getElementById('rc-total').textContent=fmtMoney(costoReceta(validas));
+}
+function rcSet(i,campo,valor){
+  rcEdit.lineas[i][campo]=valor;
+  if(campo==='material_id'){const m=getMaterial(valor);document.getElementById('rc-unit-'+i).textContent=m?(m.unidad||'unidad'):'';}
+  renderRecetaTotal();
+}
+function agregarLineaReceta(){rcEdit.lineas.push({material_id:'',cantidad:1});renderReceta();}
+function quitarLineaReceta(i){rcEdit.lineas.splice(i,1);renderReceta();}
+function copiarReceta(origenId){
+  if(!origenId)return;
+  const actuales=rcEdit.lineas.filter(l=>l.material_id);
+  if(actuales.length&&!confirm('¿Reemplazar los componentes actuales por los de la otra receta?')){document.getElementById('rc-copiar').value='';return;}
+  rcEdit.lineas=getReceta(origenId).map(l=>({...l}));
+  document.getElementById('rc-copiar').value='';
+  renderReceta();
+  toast('Receta copiada: ajusta lo que cambie y guarda');
+}
+async function guardarReceta(){
+  if(!rcEdit)return;
+  const merged={};
+  for(const l of rcEdit.lineas){
+    if(!l.material_id&&!Number(l.cantidad))continue;
+    if(!l.material_id){toast('Hay una fila sin material','error');return;}
+    const c=Number(l.cantidad);
+    if(!(c>0)){toast('Cantidad inválida en '+(getMaterial(l.material_id)?.nombre||'un componente'),'error');return;}
+    merged[l.material_id]=(merged[l.material_id]||0)+c;   // mismo material repetido → se suma
+  }
+  const lineas=Object.entries(merged).map(([material_id,cantidad])=>({material_id,cantidad:r4(cantidad)}));
+  const btn=document.getElementById('btn-rc');
+  btn.disabled=true;btn.textContent='Guardando…';
+  try{
+    if(recetasEstado==='servidor')await jsonp({action:'save_receta',maquina_id:rcEdit.maquinaId,lineas:JSON.stringify(lineas)});
+    if(lineas.length)recetas[rcEdit.maquinaId]=lineas; else delete recetas[rcEdit.maquinaId];
+    localStorage.setItem('inv_rc',JSON.stringify(recetas));
+    cerrarReceta();
+    render();
+    toast(recetasEstado==='servidor'?'Receta guardada ✓':'Receta guardada en este navegador','success');
+  }catch(e){toast('Error al guardar la receta: '+e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='Guardar receta';}
+}
+
+// ── Fabricar ──
+let fabData=null, fabOcupado=false;
+function abrirFabricar(maquinaId){
+  const mq=getMaquina(maquinaId);if(!mq)return;
+  if(!getReceta(maquinaId).length){toast('Esta máquina no tiene receta','error');return;}
+  if(fabOcupado){toast('Hay una fabricación guardándose, espera','error');return;}
+  fabData={maquinaId:String(maquinaId)};
+  document.getElementById('fab-title').textContent='Fabricar · '+mq.nombre;
+  document.getElementById('fab-qty').value=1;
+  const lastUser=localStorage.getItem('inv_usuario');
+  if(lastUser)document.getElementById('fab-usuario').value=lastUser;
+  document.getElementById('fab-progress').textContent='';
+  renderFabricar();
+  document.getElementById('modal-fab').hidden=false;
+}
+function cerrarFabricar(){
+  if(fabOcupado){toast('Espera a que termine de guardar','error');return;}
+  document.getElementById('modal-fab').hidden=true;fabData=null;
+}
+function renderFabricar(){
+  if(!fabData)return;
+  const n=Math.floor(Number(document.getElementById('fab-qty').value)||0);
+  const rc=getReceta(fabData.maquinaId);
+  let faltan=0,huerfanos=0,sinCosto=0;
+  document.getElementById('fab-list').innerHTML=rc.map(l=>{
+    const m=getMaterial(l.material_id);
+    if(!m){huerfanos++;return '<tr class="falta"><td class="l" colspan="6">Material eliminado (id '+escHtml(l.material_id)+'): edita la receta</td></tr>';}
+    const prom=getKardex('material',m.id).prom;
+    if(!prom)sinCosto++;
+    const nec=r4(l.cantidad*n), stock=Number(m.stock)||0, queda=r4(stock-nec);
+    if(queda<0)faltan++;
+    const u=escHtml(m.unidad||'unidad');
+    return '<tr'+(queda<0?' class="falta"':'')+'>'+
+      '<td class="l">'+escHtml(m.nombre)+'</td>'+
+      '<td>'+l.cantidad+' '+u+'</td>'+
+      '<td class="out">'+nec+'</td>'+
+      '<td>'+stock+'</td>'+
+      '<td class="saldo"'+(queda<0?' style="color:var(--bad);"':'')+'>'+queda+'</td>'+
+      '<td>'+(prom?fmtMoney(nec*prom):'—')+'</td>'+
+    '</tr>';
+  }).join('');
+  const w=[];
+  if(huerfanos)w.push('<div class="kx-warn bad">La receta tiene componentes que ya no existen. Edítala antes de fabricar.</div>');
+  if(faltan)w.push('<div class="kx-warn bad">Faltan '+faltan+' componente(s) para '+n+' máquina(s). Registra primero la entrada de lo que compraste, o baja la cantidad. Se pueden armar: <b>'+armables(rc)+'</b>.</div>');
+  if(sinCosto)w.push('<div class="kx-warn">'+sinCosto+' componente(s) sin costo en el kárdex: el costo de la máquina saldrá incompleto.</div>');
+  document.getElementById('fab-warns').innerHTML=w.join('');
+  document.getElementById('fab-costo').textContent=fmtMoney(costoReceta(rc));
+  document.getElementById('btn-fab').disabled=fabOcupado||n<1||faltan>0||huerfanos>0;
+}
+
+async function confirmarFabricacion(){
+  if(!fabData||fabOcupado)return;
+  const n=Math.floor(Number(document.getElementById('fab-qty').value)||0);
+  const mq=getMaquina(fabData.maquinaId);
+  const rc=getReceta(fabData.maquinaId);
+  if(!mq||n<1)return;
+  if(rc.some(l=>{const m=getMaterial(l.material_id);return !m||(Number(m.stock)||0)<l.cantidad*n-1e-9;})){renderFabricar();return;}
+  const usuario=document.getElementById('fab-usuario').value;
+  localStorage.setItem('inv_usuario',usuario);
+  const base=Date.now();
+  // Componentes primero; la máquina al final, con el costo de lo consumido (promedio del kárdex).
+  const lineas=rc.map((l,i)=>{
+    const m=getMaterial(l.material_id);
+    return {mv_id:(base+i).toString(),tipo:'material',item_id:String(m.id),item_nombre:m.nombre,delta:-r4(l.cantidad*n),
+      motivo:'uso_produccion',costo_unitario:r4(getKardex('material',m.id).prom),paso:'stock'};
+  });
+  lineas.push({mv_id:(base+rc.length).toString(),tipo:'maquina',item_id:String(mq.id),item_nombre:mq.nombre,delta:n,
+    motivo:'produccion',costo_unitario:r4(costoReceta(rc)),paso:'stock'});
+  const lote={id:base.toString(),maquina_nombre:mq.nombre,n,usuario,lineas};
+  const pend=leerJSON('inv_fab_pend',[]);pend.push(lote);
+  localStorage.setItem('inv_fab_pend',JSON.stringify(pend));
+  await procesarLote(lote);
+}
+
+function guardarLote(lote){
+  const pend=leerJSON('inv_fab_pend',[]).filter(l=>l.id!==lote.id);
+  if(lote.lineas.some(x=>x.paso!=='done'))pend.push(lote);
+  localStorage.setItem('inv_fab_pend',JSON.stringify(pend));
+}
+
+// Cada línea son dos pasos: update_stock y add_movimiento. Se guarda el paso alcanzado para
+// que "Reintentar" continúe donde quedó sin descontar dos veces.
+async function procesarLinea(lote,x){
+  const lista=x.tipo==='maquina'?maquinas:materiales;
+  if(x.paso==='stock'){
+    await jsonp({action:'update_stock',tipo:x.tipo,id:x.item_id,delta:x.delta});
+    const it=lista.find(i=>String(i.id)===x.item_id);
+    if(it)it.stock=r4((Number(it.stock)||0)+x.delta);
+    x.paso='mov';guardarLote(lote);
+  }
+  if(x.paso==='mov'){
+    const mv={id:x.mv_id,tipo:x.tipo,item_id:x.item_id,item_nombre:x.item_nombre,delta:x.delta,motivo:x.motivo,usuario:lote.usuario,costo_unitario:x.costo_unitario};
+    await jsonp({action:'add_movimiento',...mv});
+    movimientos.push({...mv,fecha:fechaHoy()});
+    x.paso='done';guardarLote(lote);
+  }
+}
+
+async function procesarLote(lote){
+  fabOcupado=true;
+  const prog=document.getElementById('fab-progress');
+  const btn=document.getElementById('btn-fab');btn.disabled=true;btn.textContent='Guardando…';
+  setSyncStatus('loading','Guardando fabricación…');
+  renderProduccion();
+  const total=lote.lineas.length;
+  const avance=()=>{prog.textContent='Guardando '+lote.lineas.filter(x=>x.paso==='done').length+' de '+total+'…';};
+  avance();
+  const componentes=lote.lineas.filter(x=>x.tipo==='material'&&x.paso!=='done');
+  const maquina=lote.lineas.filter(x=>x.tipo==='maquina'&&x.paso!=='done');
+  let errores=0;
+  const cola=[...componentes];
+  // 3 a la vez: Apps Script es lento, pero muchas en paralelo se pisan al escribir en la hoja
+  await Promise.all([0,1,2].map(async()=>{
+    while(cola.length){
+      const x=cola.shift();
+      try{await procesarLinea(lote,x);}catch(e){errores++;}
+      avance();
+    }
+  }));
+  for(const x of maquina){try{await procesarLinea(lote,x);}catch(e){errores++;}avance();}
+
+  fabOcupado=false;
+  btn.textContent='Descontar componentes y sumar máquina';
+  localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+  localStorage.setItem('inv_mt',JSON.stringify(materiales));
+  localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+  const hora=new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
+  if(!errores){
+    setSyncStatus('ok','Sincronizado · '+hora);
+    document.getElementById('modal-fab').hidden=true;fabData=null;
+    render();
+    toast(lote.maquina_nombre+' ×'+lote.n+' fabricada ✓','success');
+  }else{
+    setSyncStatus('error','Fabricación incompleta');
+    prog.textContent=errores+' registro(s) no se guardaron. Usa "Reintentar" en Producción.';
+    render();
+    toast('Fabricación incompleta: '+errores+' error(es)','error');
+  }
+}
+
+async function reintentarLote(id){
+  if(fabOcupado)return;
+  const lote=leerJSON('inv_fab_pend',[]).find(l=>l.id===id);
+  if(lote)await procesarLote(lote);
+}
+function descartarLote(id){
+  if(!confirm('¿Descartar los registros pendientes? Lo que ya se guardó se queda; lo pendiente tendrás que ajustarlo a mano.'))return;
+  localStorage.setItem('inv_fab_pend',JSON.stringify(leerJSON('inv_fab_pend',[]).filter(l=>l.id!==id)));
+  renderProduccion();
+}
+
 // ── RENDER ────────────────────────────────────────────────
-function render(){renderMaquinas();renderMateriales();renderMovimientos();renderAlertas();}
+function render(){
+  kardexCache=calcKardexAll();
+  renderMaquinas();renderMateriales();renderMovimientos();renderAlertas();renderProduccion();
+  if(fabData&&!fabOcupado)renderFabricar();
+  if(kardexAbierto)abrirKardex(kardexAbierto.id,kardexAbierto.tipo);
+}
 
 function renderKpiItems(items,prefix){
   const bajo=items.filter(i=>i.stock>0&&i.stock<=i.stock_minimo).length;
@@ -621,6 +1236,8 @@ function renderKpiItems(items,prefix){
   document.getElementById(prefix+'-stock').textContent=items.reduce((s,i)=>s+i.stock,0);
   document.getElementById(prefix+'-bajo').textContent=bajo;
   document.getElementById(prefix+'-cero').textContent=cero;
+  const tipo=prefix==='mq'?'maquina':'material';
+  document.getElementById(prefix+'-valor').textContent=fmtMoney(items.reduce((s,i)=>s+getKardex(tipo,i.id).v,0));
 }
 
 function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
@@ -672,6 +1289,8 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
       '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
       '<td data-label="Estado"><span class="status-pill '+statusClass+'">'+statusTxt+'</span></td>'+
       '<td class="actions" data-label="">'+
+        (tipo==='maquina'&&getReceta(item.id).length?'<button class="icon-btn fab" title="Fabricar" onclick="abrirFabricar(\''+item.id+'\')">'+ICON_FAB+'</button>':'')+
+        '<button class="icon-btn kx" title="Kárdex" onclick="abrirKardex(\''+item.id+'\',\''+tipo+'\')">'+ICON_KX+'</button>'+
         '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\',\''+escHtml(item.nombre)+'\')">'+ICON_UP+'</button>'+
         '<button class="icon-btn sub" title="Salida" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\',\''+escHtml(item.nombre)+'\')">'+ICON_DOWN+'</button>'+
         '<button class="icon-btn del" title="Eliminar" onclick="eliminarItem(\''+item.id+'\',\''+tipo+'\')">'+ICON_TRASH+'</button>'+
@@ -791,8 +1410,10 @@ async function addItem(tipo){
   const cat=document.getElementById(p+'-cat').value;
   const unidad=document.getElementById(p+'-unidad').value;
   const nota=document.getElementById(p+'-nota').value.trim().toUpperCase();
+  const costoTxt=document.getElementById(p+'-costo').value.trim();
   if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
   document.getElementById(p+'-nombre').classList.remove('error');
+  if(costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
   const btnId='btn-'+p;
   const btn=document.getElementById(btnId);
   btn.disabled=true;btn.textContent='Guardando…';
@@ -800,9 +1421,9 @@ async function addItem(tipo){
   try{
     await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota});
     if(stock>0){
-      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario:'Danny'};
+      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario:'Danny',costo_unitario:costoTxt?Number(costoTxt):''};
       await jsonpAction({action:'add_movimiento',...mv});
-      movimientos.push(mv);
+      movimientos.push({...mv,fecha:fechaHoy()});
     }
     if(tipo==='maquina')maquinas.push(item); else materiales.push(item);
     localStorage.setItem('inv_mq',JSON.stringify(maquinas));
@@ -811,6 +1432,7 @@ async function addItem(tipo){
     document.getElementById(p+'-nombre').value='';
     document.getElementById(p+'-stock-ini').value='';
     document.getElementById(p+'-nota').value='';
+    document.getElementById(p+'-costo').value='';
     toggleDrawer(tipo,true);
     toast('Ítem agregado ✓','success');
   }catch(e){toast('Error al guardar','error');}
@@ -834,6 +1456,14 @@ function abrirModal(itemId,tipo,direccion,nombre){
     motSel.innerHTML='<option value="venta">💰 Venta</option><option value="uso_produccion">🏭 Uso en producción</option><option value="dano">⚠️ Daño/Pérdida</option><option value="ajuste">🔧 Ajuste de inventario</option>';
   }
   document.getElementById('modal-qty').value='';
+  const prom=getKardex(tipo,itemId).prom;
+  const costoInput=document.getElementById('modal-costo');
+  costoInput.value='';
+  costoInput.placeholder=prom?String(Math.round(prom*10000)/10000):'0.00';
+  document.getElementById('modal-costo-wrap').style.display=direccion==='entrada'?'':'none';
+  document.getElementById('modal-costo-hint').textContent=direccion==='entrada'
+    ?'Obligatorio en compras. Si lo dejas vacío en devolución o ajuste, entra al costo promedio actual ('+fmtCosto(prom)+').'
+    :'Sale al costo promedio actual: '+fmtCosto(prom)+' por unidad.';
   const lastUser=localStorage.getItem('inv_usuario');
   if(lastUser)document.getElementById('modal-usuario').value=lastUser;
   document.getElementById('modal').style.display='flex';
@@ -848,8 +1478,14 @@ async function confirmarStock(){
   const motivo=document.getElementById('modal-motivo').value;
   const usuario=document.getElementById('modal-usuario').value;
   if(!qty||qty<=0){toast('Ingresa una cantidad válida','error');return;}
+  const esEntrada=modalData.direccion==='entrada';
+  const costoTxt=document.getElementById('modal-costo').value.trim();
+  if(esEntrada&&motivo==='compra'&&!costoTxt){toast('Ingresa el costo unitario de la compra','error');return;}
+  if(esEntrada&&costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
+  const prom=getKardex(modalData.tipo,modalData.itemId).prom;
+  const costo_unitario=esEntrada&&costoTxt?Number(costoTxt):Math.round(prom*10000)/10000;
   localStorage.setItem('inv_usuario',usuario);
-  const delta=modalData.direccion==='entrada'?qty:-qty;
+  const delta=esEntrada?qty:-qty;
   const btn=document.getElementById('modal-confirm');
   btn.disabled=true;btn.textContent='Guardando…';
   try{
@@ -858,9 +1494,9 @@ async function confirmarStock(){
     const item=lista.find(i=>i.id===modalData.itemId);
     if(item){
       item.stock=Math.max(0,item.stock+delta);
-      const mv={id:Date.now().toString(),tipo:modalData.tipo,item_id:modalData.itemId,item_nombre:item?.nombre||'',delta,motivo,usuario};
+      const mv={id:Date.now().toString(),tipo:modalData.tipo,item_id:modalData.itemId,item_nombre:item?.nombre||'',delta,motivo,usuario,costo_unitario};
       await jsonpAction({action:'add_movimiento',...mv});
-      movimientos.push(mv);
+      movimientos.push({...mv,fecha:fechaHoy()});
     }
     localStorage.setItem('inv_mq',JSON.stringify(maquinas));
     localStorage.setItem('inv_mt',JSON.stringify(materiales));
@@ -898,7 +1534,7 @@ function setFiltroMov(f){
 }
 
 function switchTab(tab){
-  ['maquinas','materiales','movimientos','alertas'].forEach(t=>{
+  ['maquinas','materiales','produccion','movimientos','alertas'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('stats-'+t).classList.toggle('active',t===tab);
@@ -974,8 +1610,9 @@ function exportarExcel(tipo){
 const lastUser=localStorage.getItem('inv_usuario');
 if(lastUser)document.getElementById('modal-usuario').value=lastUser;
 document.getElementById('modal-qty').addEventListener('keydown',e=>{if(e.key==='Enter')confirmarStock();});
-cargarTodo();
-setInterval(cargarTodo,60000);
+cargarTodo().then(cargarRecetas);
+// No recargar mientras se guarda una fabricación: pisaría el stock que se está descontando
+setInterval(()=>{if(!fabOcupado)cargarTodo().then(cargarRecetas);},60000);
 </script>
 </body>
 </html>
