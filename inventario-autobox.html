@@ -281,7 +281,7 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div class="stat-group" id="stats-alertas">
         <div class="stat-title">Resumen</div>
         <div class="stat-row"><span>Sin stock (0)</span><b class="mono bad" id="al-cero">0</b></div>
-        <div class="stat-row"><span>Muy bajo (1–2)</span><b class="mono warn" id="al-bajo">0</b></div>
+        <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="al-bajo">0</b></div>
         <div class="stat-row"><span>Máquinas</span><b class="mono" id="al-mq">0</b></div>
         <div class="stat-row"><span>Materiales</span><b class="mono" id="al-mt">0</b></div>
       </div>
@@ -396,16 +396,16 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div class="section-title">Sin stock <span class="section-count bad" id="al-cero-count">0</span></div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th>Unidad</th><th></th></tr></thead>
-          <tbody id="al-cero-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th class="num">Mín.</th><th>Unidad</th><th></th></tr></thead>
+          <tbody id="al-cero-list"><tr><td colspan="7" class="empty-cell">Cargando…</td></tr></tbody>
         </table>
       </div>
 
-      <div class="section-title">Stock muy bajo (1–2) <span class="section-count warn" id="al-bajo-count">0</span></div>
+      <div class="section-title">Stock bajo (en o bajo el mínimo) <span class="section-count warn" id="al-bajo-count">0</span></div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th>Unidad</th><th></th></tr></thead>
-          <tbody id="al-bajo-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th class="num">Stock</th><th class="num">Mín.</th><th>Unidad</th><th></th></tr></thead>
+          <tbody id="al-bajo-list"><tr><td colspan="7" class="empty-cell">Cargando…</td></tr></tbody>
         </table>
       </div>
       <button class="btn-secondary" onclick="exportarExcel('alertas')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar a Excel</button>
@@ -459,6 +459,13 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div class="field">
         <label>Nota (opcional)</label>
         <input type="text" id="mq-nota" placeholder="Color, variante, precio referencial…" maxlength="100"/>
+      </div>
+      <div class="field">
+        <label>Registrado por</label>
+        <select id="mq-usuario">
+          <option value="Danny">👤 Danny</option>
+          <option value="Tatiana">👤 Tatiana</option>
+        </select>
       </div>
       <button class="btn-primary" id="btn-mq" onclick="addItem('maquina')">Guardar máquina</button>
   </div>
@@ -541,6 +548,13 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div class="field">
         <label>Nota (opcional)</label>
         <input type="text" id="mt-nota" placeholder="Proveedor, referencia, voltaje, modelo…" maxlength="100"/>
+      </div>
+      <div class="field">
+        <label>Registrado por</label>
+        <select id="mt-usuario">
+          <option value="Danny">👤 Danny</option>
+          <option value="Tatiana">👤 Tatiana</option>
+        </select>
       </div>
       <button class="btn-primary" id="btn-mt" onclick="addItem('material')">Guardar material</button>
   </div>
@@ -719,9 +733,45 @@ function setSyncStatus(state,msg){
   document.getElementById('sync-txt').textContent=msg;
 }
 
+// Clave del inventario: se envía en cada petición. El Apps Script la compara con la propiedad CLAVE
+// (si no está configurada, no se exige). Si la rechaza, se pide una vez y se recuerda en este navegador.
+let pidiendoClave=null;
+function pedirClave(){
+  if(!pidiendoClave){
+    pidiendoClave=new Promise(resolve=>{
+      setTimeout(()=>{
+        const c=prompt('Clave del inventario:');
+        if(c){try{localStorage.setItem('inv_clave',c.trim());}catch(e){}}
+        resolve(!!c);
+        pidiendoClave=null;
+      },0);
+    });
+  }
+  return pidiendoClave;
+}
+async function jsonp(params,timeoutMs=20000){
+  const clave=localStorage.getItem('inv_clave')||'';
+  try{
+    return await jsonpRaw(clave?{...params,clave}:params,timeoutMs);
+  }catch(e){
+    if(e.message!=='clave_incorrecta')throw e;
+    // Otra petición en paralelo ya pudo haber pedido la clave nueva
+    if((localStorage.getItem('inv_clave')||'')===clave){
+      localStorage.removeItem('inv_clave');
+      if(!await pedirClave())throw new Error('Se necesita la clave del inventario');
+    }
+    const nueva=localStorage.getItem('inv_clave')||'';
+    try{return await jsonpRaw({...params,clave:nueva},timeoutMs);}
+    catch(e2){
+      if(e2.message==='clave_incorrecta'){localStorage.removeItem('inv_clave');throw new Error('Clave incorrecta');}
+      throw e2;
+    }
+  }
+}
+
 // onerror solo salta con fallas de red; si Apps Script responde una página de error el callback
 // nunca llega, por eso el tiempo límite. Las respuestas {error} u {ok:false} se tratan como fallo.
-function jsonp(params,timeoutMs=20000){
+function jsonpRaw(params,timeoutMs){
   return new Promise((resolve,reject)=>{
     const cb='jp_'+Date.now()+'_'+Math.random().toString(36).slice(2);
     const s=document.createElement('script');
@@ -740,6 +790,16 @@ function jsonp(params,timeoutMs=20000){
 }
 const jsonpGet=jsonp, jsonpAction=jsonp;
 
+// La hoja puede devolver números como texto ("0", "5") e ids como número: se unifican al cargar
+// para que las comparaciones (===0, ===id) y las sumas funcionen igual en todas las pestañas.
+function normItems(lista){
+  return (Array.isArray(lista)?lista:[]).map(i=>({...i,id:String(i.id),nombre:String(i.nombre??''),
+    stock:Number(i.stock)||0,stock_minimo:Number(i.stock_minimo)||0}));
+}
+function normMovs(lista){
+  return (Array.isArray(lista)?lista:[]).map(m=>({...m,item_id:String(m.item_id),item_nombre:String(m.item_nombre??''),delta:Number(m.delta)||0}));
+}
+
 async function cargarTodo(){
   setSyncStatus('loading','Cargando…');
   try{
@@ -748,9 +808,9 @@ async function cargarTodo(){
       jsonpGet({tipo:'material'}),
       jsonpGet({action:'get_movimientos'}),
     ]);
-    maquinas=Array.isArray(mq)?mq:[];
-    materiales=Array.isArray(mt)?mt:[];
-    movimientos=Array.isArray(mv)?mv:[];
+    maquinas=normItems(mq);
+    materiales=normItems(mt);
+    movimientos=normMovs(mv);
     localStorage.setItem('inv_mq',JSON.stringify(maquinas));
     localStorage.setItem('inv_mt',JSON.stringify(materiales));
     localStorage.setItem('inv_mv',JSON.stringify(movimientos));
@@ -758,17 +818,18 @@ async function cargarTodo(){
     setSyncStatus('ok','Sincronizado · '+hora);
     render();
   }catch(e){
-    setSyncStatus('error','Sin conexión');
-    maquinas=JSON.parse(localStorage.getItem('inv_mq')||'[]');
-    materiales=JSON.parse(localStorage.getItem('inv_mt')||'[]');
-    movimientos=JSON.parse(localStorage.getItem('inv_mv')||'[]');
+    const porClave=/clave/i.test(e.message);
+    setSyncStatus('error',porClave?'Falta la clave':'Sin conexión');
+    maquinas=normItems(leerJSON('inv_mq',[]));
+    materiales=normItems(leerJSON('inv_mt',[]));
+    movimientos=normMovs(leerJSON('inv_mv',[]));
     render();
-    toast('Sin conexión. Datos locales.','error');
+    toast((porClave?e.message:'Sin conexión')+'. Mostrando datos locales.','error');
   }
 }
 
 // ── HELPERS ──────────────────────────────────────────────
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function getMesMov(m){
   const hoy=new Date();
   // fecha viene como dd/mm/yyyy from Apps Script toLocaleDateString es-EC
@@ -1257,7 +1318,7 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
   cats.forEach(cat=>{
     const c=catsMap[cat]||{label:cat};
     const cnt=items.filter(i=>i.categoria===cat).length;
-    opts+='<option value="'+cat+'">'+c.label+' ('+cnt+')</option>';
+    opts+='<option value="'+escHtml(cat)+'">'+escHtml(c.label)+' ('+cnt+')</option>';
   });
   selEl.innerHTML=opts;
   selEl.value=filtro;
@@ -1283,7 +1344,7 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
     const statusTxt=isAgotado?'Agotado':isBajo?'Bajo':'OK';
     return '<tr>'+
       '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
-      '<td data-label="Categoría">'+c.label+'</td>'+
+      '<td data-label="Categoría">'+escHtml(c.label)+'</td>'+
       '<td data-label="Stock" class="num">'+item.stock+'</td>'+
       '<td data-label="Mín." class="num">'+item.stock_minimo+'</td>'+
       '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
@@ -1291,8 +1352,8 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
       '<td class="actions" data-label="">'+
         (tipo==='maquina'&&getReceta(item.id).length?'<button class="icon-btn fab" title="Fabricar" onclick="abrirFabricar(\''+item.id+'\')">'+ICON_FAB+'</button>':'')+
         '<button class="icon-btn kx" title="Kárdex" onclick="abrirKardex(\''+item.id+'\',\''+tipo+'\')">'+ICON_KX+'</button>'+
-        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\',\''+escHtml(item.nombre)+'\')">'+ICON_UP+'</button>'+
-        '<button class="icon-btn sub" title="Salida" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\',\''+escHtml(item.nombre)+'\')">'+ICON_DOWN+'</button>'+
+        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\')">'+ICON_UP+'</button>'+
+        '<button class="icon-btn sub" title="Salida" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\')">'+ICON_DOWN+'</button>'+
         '<button class="icon-btn del" title="Eliminar" onclick="eliminarItem(\''+item.id+'\',\''+tipo+'\')">'+ICON_TRASH+'</button>'+
       '</td>'+
     '</tr>';
@@ -1342,7 +1403,6 @@ function renderMovimientos(){
 }
 
 // ── STOCK CRÍTICO ────────────────────────────────────────
-const STOCK_MUY_BAJO=2;
 
 function getAlertas(){
   const todos=[
@@ -1351,7 +1411,7 @@ function getAlertas(){
   ];
   const byName=(a,b)=>a.nombre.localeCompare(b.nombre);
   const cero=todos.filter(i=>Number(i.stock)<=0).sort(byName);
-  const bajo=todos.filter(i=>Number(i.stock)>0&&Number(i.stock)<=STOCK_MUY_BAJO)
+  const bajo=todos.filter(i=>i.stock>0&&i.stock<=i.stock_minimo)
     .sort((a,b)=>Number(a.stock)-Number(b.stock)||byName(a,b));
   return {cero,bajo};
 }
@@ -1359,7 +1419,7 @@ function getAlertas(){
 function renderAlertaRows(items,listId,msgVacio){
   const el=document.getElementById(listId);
   if(!items.length){
-    el.innerHTML='<tr><td colspan="6" class="empty-cell">'+msgVacio+'</td></tr>';
+    el.innerHTML='<tr><td colspan="7" class="empty-cell">'+msgVacio+'</td></tr>';
     return;
   }
   el.innerHTML=items.map(item=>{
@@ -1369,11 +1429,12 @@ function renderAlertaRows(items,listId,msgVacio){
     return '<tr>'+
       '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
       '<td data-label="Tipo">'+(item.tipo==='maquina'?'Máquina':'Material')+'</td>'+
-      '<td data-label="Categoría">'+c.label+'</td>'+
+      '<td data-label="Categoría">'+escHtml(c.label)+'</td>'+
       '<td data-label="Stock" class="num" style="color:'+color+';">'+item.stock+'</td>'+
+      '<td data-label="Mín." class="num">'+item.stock_minimo+'</td>'+
       '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
       '<td class="actions" data-label="">'+
-        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+item.tipo+'\',\'entrada\',\''+escHtml(item.nombre)+'\')">'+ICON_UP+'</button>'+
+        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+item.tipo+'\',\'entrada\')">'+ICON_UP+'</button>'+
       '</td>'+
     '</tr>';
   }).join('');
@@ -1398,7 +1459,7 @@ function renderAlertas(){
   document.getElementById('al-cero-count').textContent=ceroF.length;
   document.getElementById('al-bajo-count').textContent=bajoF.length;
   renderAlertaRows(ceroF,'al-cero-list','Ningún ítem sin stock 👍');
-  renderAlertaRows(bajoF,'al-bajo-list','Ningún ítem con stock muy bajo 👍');
+  renderAlertaRows(bajoF,'al-bajo-list','Ningún ítem bajo su stock mínimo 👍');
 }
 
 // ── ACCIONES ─────────────────────────────────────────────
@@ -1411,6 +1472,7 @@ async function addItem(tipo){
   const unidad=document.getElementById(p+'-unidad').value;
   const nota=document.getElementById(p+'-nota').value.trim().toUpperCase();
   const costoTxt=document.getElementById(p+'-costo').value.trim();
+  const usuario=document.getElementById(p+'-usuario').value;
   if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
   document.getElementById(p+'-nombre').classList.remove('error');
   if(costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
@@ -1420,8 +1482,9 @@ async function addItem(tipo){
   const item={id:Date.now().toString(),nombre,categoria:cat,stock,stock_minimo:min,unidad,nota};
   try{
     await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota});
+    localStorage.setItem('inv_usuario',usuario);
     if(stock>0){
-      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario:'Danny',costo_unitario:costoTxt?Number(costoTxt):''};
+      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario,costo_unitario:costoTxt?Number(costoTxt):''};
       await jsonpAction({action:'add_movimiento',...mv});
       movimientos.push({...mv,fecha:fechaHoy()});
     }
@@ -1435,7 +1498,7 @@ async function addItem(tipo){
     document.getElementById(p+'-costo').value='';
     toggleDrawer(tipo,true);
     toast('Ítem agregado ✓','success');
-  }catch(e){toast('Error al guardar','error');}
+  }catch(e){toast('Error al guardar: '+e.message,'error');}
   finally{btn.disabled=false;btn.textContent=tipo==='maquina'?'Guardar máquina':'Guardar material';}
 }
 
@@ -1443,10 +1506,15 @@ function toggleDrawer(tipo,forceClose){
   const id=tipo==='maquina'?'drawer-mq':'drawer-mt';
   const el=document.getElementById(id);
   el.hidden = forceClose ? true : !el.hidden;
+  const lastUser=localStorage.getItem('inv_usuario');
+  if(!el.hidden&&lastUser)document.getElementById((tipo==='maquina'?'mq':'mt')+'-usuario').value=lastUser;
 }
 
-function abrirModal(itemId,tipo,direccion,nombre){
-  modalData={itemId,tipo,direccion};
+function abrirModal(itemId,tipo,direccion){
+  const item=(tipo==='maquina'?maquinas:materiales).find(i=>i.id===String(itemId));
+  if(!item)return;
+  modalData={itemId:item.id,tipo,direccion};
+  const nombre=item.nombre+' · stock actual: '+item.stock+' '+(item.unidad||'unidad');
   document.getElementById('modal-title').textContent=direccion==='entrada'?'Registrar entrada':'Registrar salida';
   document.getElementById('modal-item-name').textContent=nombre;
   const motSel=document.getElementById('modal-motivo');
@@ -1479,6 +1547,8 @@ async function confirmarStock(){
   const usuario=document.getElementById('modal-usuario').value;
   if(!qty||qty<=0){toast('Ingresa una cantidad válida','error');return;}
   const esEntrada=modalData.direccion==='entrada';
+  const itemSel=(modalData.tipo==='maquina'?maquinas:materiales).find(i=>i.id===modalData.itemId);
+  if(!esEntrada&&itemSel&&qty>itemSel.stock+1e-9){toast('Solo hay '+itemSel.stock+' '+(itemSel.unidad||'unidad')+' en stock','error');return;}
   const costoTxt=document.getElementById('modal-costo').value.trim();
   if(esEntrada&&motivo==='compra'&&!costoTxt){toast('Ingresa el costo unitario de la compra','error');return;}
   if(esEntrada&&costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
@@ -1493,7 +1563,7 @@ async function confirmarStock(){
     const lista=modalData.tipo==='maquina'?maquinas:materiales;
     const item=lista.find(i=>i.id===modalData.itemId);
     if(item){
-      item.stock=Math.max(0,item.stock+delta);
+      item.stock=r4(item.stock+delta);
       const mv={id:Date.now().toString(),tipo:modalData.tipo,item_id:modalData.itemId,item_nombre:item?.nombre||'',delta,motivo,usuario,costo_unitario};
       await jsonpAction({action:'add_movimiento',...mv});
       movimientos.push({...mv,fecha:fechaHoy()});
@@ -1504,7 +1574,7 @@ async function confirmarStock(){
     cerrarModal();
     render();
     toast('Stock actualizado ✓','success');
-  }catch(e){toast('Error al actualizar','error');}
+  }catch(e){toast('Error al actualizar: '+e.message,'error');}
   finally{btn.disabled=false;btn.textContent='Confirmar';}
 }
 
@@ -1520,7 +1590,7 @@ async function eliminarItem(id,tipo){
     localStorage.setItem('inv_mt',JSON.stringify(materiales));
     render();
     toast('Ítem eliminado','success');
-  }catch(e){toast('Error al eliminar','error');}
+  }catch(e){toast('Error al eliminar: '+e.message,'error');}
 }
 
 function setFiltro(tipo,cat){
@@ -1582,14 +1652,14 @@ function exportarExcel(tipo){
   } else if(tipo==='alertas'){
     const {cero,bajo}=getAlertas();
     if(!cero.length&&!bajo.length){toast('No hay ítems con stock crítico','error');return;}
-    const fila=i=>[i.nombre,i.tipo==='maquina'?'Máquina':'Material',((i.tipo==='maquina'?CATS_MQ:CATS_MT)[i.categoria]||{label:i.categoria}).label,i.stock,i.unidad||'unidad',i.nota||''];
-    const cab=['Nombre','Tipo','Categoría','Stock','Unidad','Nota'];
+    const fila=i=>[i.nombre,i.tipo==='maquina'?'Máquina':'Material',((i.tipo==='maquina'?CATS_MQ:CATS_MT)[i.categoria]||{label:i.categoria}).label,i.stock,i.stock_minimo,i.unidad||'unidad',i.nota||''];
+    const cab=['Nombre','Tipo','Categoría','Stock','Stock mín.','Unidad','Nota'];
     const det=[['STOCK CRÍTICO AUTOBOX'],['Exportado:',fecha],[],['SIN STOCK ('+cero.length+')'],cab];
     cero.forEach(i=>det.push(fila(i)));
-    det.push([],['STOCK MUY BAJO 1–2 ('+bajo.length+')'],cab);
+    det.push([],['STOCK BAJO, EN O BAJO EL MÍNIMO ('+bajo.length+')'],cab);
     bajo.forEach(i=>det.push(fila(i)));
     const ws=XLSX.utils.aoa_to_sheet(det);
-    ws['!cols']=[{wch:36},{wch:12},{wch:20},{wch:8},{wch:10},{wch:28}];
+    ws['!cols']=[{wch:36},{wch:12},{wch:20},{wch:8},{wch:10},{wch:10},{wch:28}];
     XLSX.utils.book_append_sheet(wb,ws,'Stock crítico');
     XLSX.writeFile(wb,'AUTOBOX_Stock_Critico_'+fecha.replace(/\//g,'-')+'.xlsx');
   } else {
