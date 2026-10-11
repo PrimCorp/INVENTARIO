@@ -254,7 +254,8 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         <div class="stat-row"><span>Stock total</span><b class="mono" id="mq-stock">0</b></div>
         <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="mq-bajo">0</b></div>
         <div class="stat-row"><span>Sin stock</span><b class="mono bad" id="mq-cero">0</b></div>
-        <div class="stat-row"><span>Valor (kárdex)</span><b class="mono" id="mq-valor">$0.00</b></div>
+        <div class="stat-row"><span>Valor a costo (kárdex)</span><b class="mono" id="mq-valor">$0.00</b></div>
+        <div class="stat-row"><span>Valor a precio de venta</span><b class="mono" id="mq-venta">$0.00</b></div>
       </div>
       <div class="stat-group" id="stats-materiales">
         <div class="stat-title">Resumen</div>
@@ -347,8 +348,8 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div id="pr-banners"></div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Máquina</th><th class="num">Componentes</th><th class="num">Costo por máquina</th><th class="num">Se pueden armar</th><th class="num">En stock</th><th></th></tr></thead>
-          <tbody id="pr-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+          <thead><tr><th>Máquina</th><th class="num">Componentes</th><th class="num">Costo por máquina</th><th class="num">Precio de venta</th><th class="num">Ganancia</th><th class="num">Se pueden armar</th><th class="num">En stock</th><th></th></tr></thead>
+          <tbody id="pr-list"><tr><td colspan="8" class="empty-cell">Cargando…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -453,8 +454,9 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         </div>
       </div>
       <div class="field">
-        <label>Costo unitario ($) del stock inicial</label>
-        <input type="number" id="mq-costo" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/>
+        <label>Precio de venta ($)</label>
+        <input type="number" id="mq-precio" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/>
+        <span class="cell-note">Precio final de la máquina terminada. El costo sale de su receta (Producción).</span>
       </div>
       <div class="field">
         <label>Nota (opcional)</label>
@@ -794,7 +796,8 @@ const jsonpGet=jsonp, jsonpAction=jsonp;
 // para que las comparaciones (===0, ===id) y las sumas funcionen igual en todas las pestañas.
 function normItems(lista){
   return (Array.isArray(lista)?lista:[]).map(i=>({...i,id:String(i.id),nombre:String(i.nombre??''),
-    stock:Number(i.stock)||0,stock_minimo:Number(i.stock_minimo)||0}));
+    stock:Number(i.stock)||0,stock_minimo:Number(i.stock_minimo)||0,
+    precio_venta:costoValido(i.precio_venta)?Number(i.precio_venta):''}));
 }
 function normMovs(lista){
   return (Array.isArray(lista)?lista:[]).map(m=>({...m,item_id:String(m.item_id),item_nombre:String(m.item_nombre??''),delta:Number(m.delta)||0}));
@@ -856,9 +859,13 @@ const MOTIVOS={compra:'Compra',devolucion:'Devolución',ajuste:'Ajuste de invent
 // Recorre los movimientos en orden cronológico (orden de la hoja) y arma el kárdex de cada ítem.
 // Entrada: suma cantidad y valor, recalcula el promedio. Si no trae costo, entra al promedio vigente.
 // Salida: sale al costo promedio vigente; el promedio no cambia.
+// Máquinas: una entrada sin costo (p. ej. el stock inicial) se valora al costo actual de su receta.
+// Por eso se calculan primero los materiales y después las máquinas.
 function calcKardexAll(){
   const map={};
-  movimientos.forEach(m=>{
+  const costoRecetaDe=id=>(recetas[String(id)]||[]).reduce((s,l)=>s+l.cantidad*((map['material:'+String(l.material_id)]||{}).prom||0),0);
+  const movsMaq=movimientos.filter(m=>m.tipo==='maquina');
+  movimientos.filter(m=>m.tipo!=='maquina').concat(movsMaq).forEach(m=>{
     const key=m.tipo+':'+String(m.item_id);
     const k=map[key]||(map[key]={rows:[],q:0,v:0,prom:0,sinCosto:0,negativo:false});
     const delta=Number(m.delta)||0;
@@ -866,11 +873,12 @@ function calcKardexAll(){
     const row={fecha:m.fecha||'—',motivo:MOTIVOS[m.motivo]||m.motivo||'—',usuario:m.usuario||'—'};
     if(delta>0){
       const tieneCosto=costoValido(m.costo_unitario);
-      const cu=tieneCosto?Number(m.costo_unitario):k.prom;
-      if(!tieneCosto)k.sinCosto++;
+      const porReceta=!tieneCosto&&m.tipo==='maquina'&&(recetas[String(m.item_id)]||[]).length>0;
+      const cu=tieneCosto?Number(m.costo_unitario):porReceta?costoRecetaDe(m.item_id):k.prom;
+      if(!tieneCosto&&!porReceta)k.sinCosto++;
       k.q+=delta;k.v+=delta*cu;
       k.prom=k.q>0?k.v/k.q:cu;
-      Object.assign(row,{inQ:delta,inCu:cu,inT:delta*cu,sinCosto:!tieneCosto});
+      Object.assign(row,{inQ:delta,inCu:cu,inT:delta*cu,sinCosto:!tieneCosto&&!porReceta,porReceta});
     }else{
       const q=-delta,cu=k.prom;
       k.q-=q;
@@ -912,7 +920,7 @@ function abrirKardex(id,tipo){
     const n=v=>v===undefined?'':v;
     el.innerHTML=k.rows.map(r=>'<tr>'+
       '<td class="l">'+escHtml(r.fecha)+'</td>'+
-      '<td class="l">'+escHtml(r.motivo)+(r.sinCosto?'<span class="kx-flag">sin costo</span>':'')+'</td>'+
+      '<td class="l">'+escHtml(r.motivo)+(r.sinCosto?'<span class="kx-flag">sin costo</span>':'')+(r.porReceta?'<span class="kx-flag">costo de receta</span>':'')+'</td>'+
       '<td class="l">'+escHtml(r.usuario)+'</td>'+
       '<td class="g in">'+n(r.inQ)+'</td><td class="in">'+(r.inQ?fmtCosto(r.inCu):'')+'</td><td class="in">'+(r.inQ?fmtMoney(r.inT):'')+'</td>'+
       '<td class="g out">'+n(r.outQ)+'</td><td class="out">'+(r.outQ?fmtCosto(r.outCu):'')+'</td><td class="out">'+(r.outQ?fmtMoney(r.outT):'')+'</td>'+
@@ -939,7 +947,7 @@ function exportarKardex(){
     ['Fecha','Detalle','Usuario','Cant.','C. unit.','Total','Cant.','C. unit.','Total','Cant.','C. prom.','Valor'],
   ];
   k.rows.forEach(r=>det.push([
-    r.fecha,r.motivo+(r.sinCosto?' (sin costo)':''),r.usuario,
+    r.fecha,r.motivo+(r.sinCosto?' (sin costo)':'')+(r.porReceta?' (costo de receta)':''),r.usuario,
     r.inQ??'',r.inQ?r4(r.inCu):'',r.inQ?r2(r.inT):'',
     r.outQ??'',r.outQ?r4(r.outCu):'',r.outQ?r2(r.outT):'',
     r.q,r4(r.prom),r2(r.v),
@@ -1019,7 +1027,7 @@ function renderProduccion(){
   let con=0,sin=0,arm=0,bloq=0;
   const el=document.getElementById('pr-list');
   if(!maquinas.length){
-    el.innerHTML='<tr><td colspan="6" class="empty-cell">Primero crea las máquinas en la pestaña Máquinas</td></tr>';
+    el.innerHTML='<tr><td colspan="8" class="empty-cell">Primero crea las máquinas en la pestaña Máquinas</td></tr>';
   }else{
     el.innerHTML=[...maquinas].sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(mq=>{
       const rc=getReceta(mq.id);
@@ -1033,10 +1041,13 @@ function renderProduccion(){
            !tiene?'<span class="cell-note">Sin receta</span>':'')+'</td>'+
         '<td data-label="Componentes" class="num">'+(tiene?rc.length:'—')+'</td>'+
         '<td data-label="Costo por máquina" class="num">'+(tiene?fmtMoney(costoReceta(rc)):'—')+'</td>'+
+        '<td data-label="Precio de venta" class="num">'+(costoValido(mq.precio_venta)?fmtMoney(mq.precio_venta):'—')+'</td>'+
+        '<td data-label="Ganancia" class="num">'+(tiene&&costoValido(mq.precio_venta)?(()=>{const g=mq.precio_venta-costoReceta(rc);return '<span style="color:'+(g>=0?'var(--ok)':'var(--bad)')+';">'+fmtMoney(g)+'</span>';})():'—')+'</td>'+
         '<td data-label="Se pueden armar" class="num" style="color:'+(!tiene?'var(--text-3)':n>0?'var(--ok)':'var(--bad)')+';">'+(tiene?n:'—')+'</td>'+
         '<td data-label="En stock" class="num">'+mq.stock+'</td>'+
         '<td class="actions" data-label="">'+
           '<button class="btn-sm" onclick="abrirReceta(\''+mq.id+'\')">'+(tiene?'Editar receta':'Crear receta')+'</button>'+
+          '<button class="btn-sm" onclick="editarPrecio(\''+mq.id+'\')">Precio</button>'+
           '<button class="btn-sm primary" onclick="abrirFabricar(\''+mq.id+'\')"'+(tiene?'':' disabled')+'>Fabricar</button>'+
         '</td>'+
       '</tr>';
@@ -1299,6 +1310,7 @@ function renderKpiItems(items,prefix){
   document.getElementById(prefix+'-cero').textContent=cero;
   const tipo=prefix==='mq'?'maquina':'material';
   document.getElementById(prefix+'-valor').textContent=fmtMoney(items.reduce((s,i)=>s+getKardex(tipo,i.id).v,0));
+  if(prefix==='mq')document.getElementById('mq-venta').textContent=fmtMoney(items.reduce((s,i)=>s+(costoValido(i.precio_venta)?i.stock*i.precio_venta:0),0));
 }
 
 function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
@@ -1463,6 +1475,22 @@ function renderAlertas(){
 }
 
 // ── ACCIONES ─────────────────────────────────────────────
+async function editarPrecio(id){
+  const mq=getMaquina(id);
+  if(!mq)return;
+  const txt=prompt('Precio de venta de '+mq.nombre+' ($). Déjalo vacío para quitarlo:',costoValido(mq.precio_venta)?String(mq.precio_venta):'');
+  if(txt===null)return;
+  const v=txt.trim().replace(',','.');
+  if(v&&!costoValido(v)){toast('Precio de venta inválido','error');return;}
+  try{
+    await jsonpAction({action:'set_precio',tipo:'maquina',id:mq.id,precio_venta:v});
+    mq.precio_venta=v?Number(v):'';
+    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+    render();
+    toast('Precio guardado ✓','success');
+  }catch(e){toast('Error al guardar: '+e.message,'error');}
+}
+
 async function addItem(tipo){
   const p=tipo==='maquina'?'mq':'mt';
   const nombre=document.getElementById(p+'-nombre').value.trim().toUpperCase();
@@ -1471,17 +1499,20 @@ async function addItem(tipo){
   const cat=document.getElementById(p+'-cat').value;
   const unidad=document.getElementById(p+'-unidad').value;
   const nota=document.getElementById(p+'-nota').value.trim().toUpperCase();
-  const costoTxt=document.getElementById(p+'-costo').value.trim();
+  // Máquinas: no se pide costo (sale de la receta), sino el precio de venta
+  const costoTxt=tipo==='maquina'?'':document.getElementById(p+'-costo').value.trim();
+  const precioTxt=tipo==='maquina'?document.getElementById('mq-precio').value.trim():'';
   const usuario=document.getElementById(p+'-usuario').value;
   if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
   document.getElementById(p+'-nombre').classList.remove('error');
   if(costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
+  if(precioTxt&&!costoValido(precioTxt)){toast('Precio de venta inválido','error');return;}
   const btnId='btn-'+p;
   const btn=document.getElementById(btnId);
   btn.disabled=true;btn.textContent='Guardando…';
-  const item={id:Date.now().toString(),nombre,categoria:cat,stock,stock_minimo:min,unidad,nota};
+  const item={id:Date.now().toString(),nombre,categoria:cat,stock,stock_minimo:min,unidad,nota,precio_venta:precioTxt?Number(precioTxt):''};
   try{
-    await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota});
+    await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota,precio_venta:item.precio_venta});
     localStorage.setItem('inv_usuario',usuario);
     if(stock>0){
       const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario,costo_unitario:costoTxt?Number(costoTxt):''};
@@ -1495,7 +1526,7 @@ async function addItem(tipo){
     document.getElementById(p+'-nombre').value='';
     document.getElementById(p+'-stock-ini').value='';
     document.getElementById(p+'-nota').value='';
-    document.getElementById(p+'-costo').value='';
+    document.getElementById(tipo==='maquina'?'mq-precio':p+'-costo').value='';
     toggleDrawer(tipo,true);
     toast('Ítem agregado ✓','success');
   }catch(e){toast('Error al guardar: '+e.message,'error');}
