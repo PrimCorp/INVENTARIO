@@ -3,32 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#22262b">
+<meta name="theme-color" content="#1f323b">
 <title>AUTOBOX · Inventario</title>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --sidebar-bg:#22262b;--sidebar-text:#e7e8ea;--sidebar-text-dim:#8b9096;--sidebar-active:#2f343a;--sidebar-border:#31363c;
-  --bg:#f6f6f4;--surface:#fff;--border:#e2e2de;--border-strong:#c7c7c2;
-  --text:#1c1d1f;--text-2:#5a5c60;--text-3:#93959a;
-  --accent:#b5652c;--accent-contrast:#fff;
-  --ok:#2f8f4e;--ok-bg:#e9f5ec;
-  --warn:#b8811f;--warn-bg:#fbf1de;
-  --bad:#c1432b;--bad-bg:#fbe9e5;
-  --radius:8px;--radius-sm:5px;
-  --font-ui:'Public Sans',-apple-system,sans-serif;
-  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --head:#1f323b;--head-fg:#e4edf0;--head-muted:#9db2bb;--panel2:#f4f7f8;--sel:#d9ebf1;--chip:#e3e9ec;
+  --bg:#eaeef0;--surface:#fff;--border:#cfd8dc;--border-strong:#b3c1c7;
+  --text:#1b282e;--text-2:#56666e;--text-3:#7f8e95;
+  --accent:#0c6a84;--accent-contrast:#fff;
+  --ok:#2c7a4b;--ok-bg:#e2f0e7;
+  --warn:#a96300;--warn-bg:#f7ebd8;
+  --bad:#b0281f;--bad-bg:#f7e2df;
+  --radius:4px;--radius-sm:3px;
+  --font-display:'Barlow Semi Condensed','Arial Narrow',Arial,sans-serif;
+  --font-ui:'IBM Plex Sans','Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',Consolas,'Courier New',monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --sidebar-bg:#17191c;--sidebar-text:#e7e8ea;--sidebar-text-dim:#797d83;--sidebar-active:#212427;--sidebar-border:#25282c;
-    --bg:#121314;--surface:#1a1b1d;--border:#2b2c2f;--border-strong:#3c3e42;
-    --text:#eceded;--text-2:#a9abae;--text-3:#6d6f73;
-    --accent:#d98a4f;--accent-contrast:#181008;
-    --ok:#49b46e;--ok-bg:rgba(47,143,78,0.16);
-    --warn:#d9a53f;--warn-bg:rgba(184,129,31,0.18);
-    --bad:#dd6650;--bad-bg:rgba(193,67,43,0.18);
+    --head:#0b1013;--head-fg:#dbe5e9;--head-muted:#7f949d;--panel2:#1f282d;--sel:#1e3a44;--chip:#26323a;
+    --bg:#111719;--surface:#192125;--border:#2e3b41;--border-strong:#41525a;
+    --text:#dbe5e9;--text-2:#93a4ac;--text-3:#6c7d85;
+    --accent:#52b4cf;--accent-contrast:#0a1a20;
+    --ok:#5fc48b;--ok-bg:rgba(95,196,139,0.14);
+    --warn:#e2a64a;--warn-bg:rgba(226,166,74,0.15);
+    --bad:#f0736a;--bad-bg:rgba(240,115,106,0.15);
+    color-scheme:dark;
   }
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -40,27 +43,32 @@ button,input,select{font-family:var(--font-ui);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* SHELL */
-.shell{display:flex;min-height:100vh;}
-.sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);color:var(--sidebar-text);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
-.sidebar-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--sidebar-border);}
-.brand-mark{width:30px;height:30px;border-radius:6px;background:var(--accent);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.72rem;flex-shrink:0;letter-spacing:.02em;}
-.brand-name{font-weight:800;font-size:1.02rem;letter-spacing:-.01em;}
-.brand-sub{font-size:.62rem;color:var(--sidebar-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
-.sidebar-nav{padding:10px 10px;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--sidebar-border);}
-.nav-item{text-align:left;padding:9px 10px;border-radius:6px;background:none;border:none;color:var(--sidebar-text-dim);font-weight:600;font-size:.82rem;cursor:pointer;transition:background .12s,color .12s;}
-.nav-item:hover{background:var(--sidebar-active);color:var(--sidebar-text);}
-.nav-item.active{background:var(--sidebar-active);color:var(--sidebar-text);box-shadow:inset 2px 0 0 var(--accent);}
-.sidebar-stats{padding:14px 16px;flex:1;}
-.stat-group{display:none;flex-direction:column;gap:9px;}
-.stat-group.active{display:flex;}
-.stat-title{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sidebar-text-dim);margin-bottom:2px;}
-.stat-row{display:flex;align-items:baseline;justify-content:space-between;font-size:.78rem;color:var(--sidebar-text-dim);}
-.stat-row b{font-family:var(--font-mono);font-size:.92rem;font-weight:700;color:var(--sidebar-text);}
-.stat-row b.warn{color:#e0aa4f;}
-.stat-row b.bad{color:#ea7a5e;}
-.sidebar-sync{display:flex;align-items:center;gap:7px;padding:12px 16px;border-top:1px solid var(--sidebar-border);font-size:.66rem;color:var(--sidebar-text-dim);font-family:var(--font-mono);}
-.led{width:6px;height:6px;border-radius:50%;background:var(--ok);flex-shrink:0;}
+/* SHELL: consola de taller — barra de módulos arriba, resumen en tarjetas, barra de teclas abajo */
+.shell{display:flex;flex-direction:column;min-height:100vh;}
+.wrap{width:100%;max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+header.top{background:var(--head);color:var(--head-fg);position:sticky;top:0;z-index:100;}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px;padding-top:10px;padding-bottom:0;}
+.brand{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:.02em;display:flex;align-items:baseline;gap:10px;padding-bottom:8px;}
+.brand small{font-family:var(--font-mono);font-weight:400;font-size:11px;color:var(--head-muted);letter-spacing:.04em;}
+.sidebar-nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:100%;}
+.sidebar-nav::-webkit-scrollbar{display:none;}
+.nav-item{font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;background:transparent;color:var(--head-muted);border:0;border-bottom:3px solid transparent;padding:6px 10px 9px;cursor:pointer;white-space:nowrap;transition:color .12s,border-color .12s;}
+.nav-item:hover{color:var(--head-fg);}
+.nav-item.active{color:var(--head-fg);border-bottom-color:var(--accent);}
+.sidebar-stats{margin-bottom:14px;}
+.stat-group{display:none;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.stat-group.active{display:grid;}
+.stat-title{display:none;}
+.stat-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;display:flex;flex-direction:column;gap:1px;}
+.stat-row span{font-family:var(--font-display);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);}
+.stat-row b{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--text);line-height:1.25;}
+.stat-row b.warn{color:var(--warn);}
+.stat-row b.bad{color:var(--bad);}
+footer.bar{border-top:1px solid var(--border);background:var(--surface);position:sticky;bottom:0;z-index:90;}
+footer.bar .wrap{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between;align-items:center;padding-top:7px;padding-bottom:7px;font-size:12.5px;color:var(--text-2);}
+.sidebar-sync{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:12px;}
+.key{font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-bottom-width:2px;border-radius:3px;padding:0 4px;color:var(--text-2);}
+.led{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;}
 .led.loading{background:var(--warn);animation:pulse 1s infinite;}
 .led.error{background:var(--bad);}
 
@@ -211,42 +219,134 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
   .rc-unit{display:none;}
 }
 
-/* MOBILE SHELL */
-.mobile-topbar{display:none;}
-@media(max-width:900px){
-  .shell{flex-direction:column;}
-  .sidebar{position:static;width:auto;height:auto;flex-direction:row;align-items:center;overflow:visible;flex-wrap:wrap;padding:10px 12px;gap:10px;}
-  .sidebar-brand{border:none;padding:0;flex-shrink:0;}
-  .sidebar-nav{border:none;flex-direction:row;padding:0;flex:1;overflow-x:auto;}
-  .sidebar-stats{display:none;}
-  .sidebar-sync{border:none;padding:0;margin-left:auto;flex-shrink:0;}
-  .content{padding:16px 14px 60px;}
+/* DOCUMENTOS / BODEGAS / SERIES */
+.field textarea,.doc-table textarea{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:.8rem;outline:none;resize:vertical;min-height:38px;text-transform:uppercase;}
+.field textarea:focus,.doc-table textarea:focus{border-color:var(--accent);}
+.chk{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-2);margin-bottom:12px;cursor:pointer;}
+.chk input{width:auto;}
+.tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:50px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;vertical-align:1px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);}
+.tag.acc{background:var(--warn-bg);color:var(--accent);border-color:transparent;}
+.tag.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent;}
+.tag.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent;}
+.data-table tr.anulado td:not(.actions){opacity:.5;}
+.data-table tr.anulado td.cell-name{text-decoration:line-through;}
+.data-table tr.det>td{background:var(--bg);padding:0 12px 12px;}
+.data-table tr.det>td::before{display:none;}
+@media(max-width:760px){.data-table tr.det>td{display:block;padding:4px 0 10px;}}
+@media(max-width:900px){.content{width:100%;}}
+.picks{display:flex;flex-wrap:wrap;gap:4px 10px;font-family:var(--font-mono);font-size:.74rem;max-height:110px;overflow-y:auto;}
+.picks label{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;}
+.picks input{width:auto;}
+.picks-empty{font-size:.74rem;color:var(--bad);}
+table.doc-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.8rem;}
+.doc-table th{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:7px 6px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+.doc-table td{padding:6px;border-bottom:1px solid var(--border);vertical-align:top;}
+.doc-table select,.doc-table input{width:100%;padding:7px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:.8rem;outline:none;}
+.doc-table input[type=number]{font-family:var(--font-mono);text-align:right;}
+.doc-table select:focus,.doc-table input:focus{border-color:var(--accent);}
+.doc-table .disp{font-family:var(--font-mono);font-size:.74rem;color:var(--text-3);white-space:nowrap;padding-top:13px;}
+.sub-line{font-size:.7rem;color:var(--text-3);margin-top:3px;}
+.card-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:16px;}
+.card-box h3{font-size:.86rem;font-weight:800;margin-bottom:10px;}
+.inline-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:10px;}
+.inline-form .field{margin-bottom:0;flex:1 1 140px;}
+.inline-form .btn-sm{margin:0 0 2px;padding:9px 14px;}
+.banner-srv{background:var(--bad-bg);color:var(--bad);border-radius:var(--radius-sm);padding:10px 14px;font-size:.8rem;font-weight:600;margin-bottom:14px;}
+.banner-srv[hidden]{display:none;}
+
+/* MOBILE */
+@media(max-width:700px){
+  .brand{font-size:18px;}
+  .stat-group{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .stat-row b{font-size:19px;}
+  .content{padding-top:14px;}
+  footer.bar .teclas{display:none;}
 }
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);border-radius:6px;padding:10px 18px;font-size:.8rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:999;white-space:nowrap;animation:toastIn .2s ease;}
 .toast.error{background:var(--bad);color:#fff;}
 .toast.success{background:var(--ok);color:#fff;}
+
+/* ── Diseño taller: tablas densas, letra Barlow en títulos, controles rectos ── */
+.content.wrap{flex:1;max-width:1280px;padding-top:16px;padding-bottom:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+.content-header{margin-bottom:6px;}
+.content-header h1{font-family:var(--font-display);font-weight:600;font-size:22px;letter-spacing:0;}
+.kx-sub{color:var(--text-2);max-width:80ch;}
+.btn-new,.btn-secondary,.btn-primary,.btn-sm,.modal-btn{border-radius:var(--radius-sm);font-family:var(--font-ui);}
+.btn-new{font-weight:600;font-size:13.5px;padding:7px 14px;}
+.btn-secondary{font-weight:600;font-size:13px;padding:6px 12px;border-color:var(--border);}
+.btn-secondary:hover,.btn-sm:hover{border-color:var(--accent);background:var(--surface);}
+.btn-sm{font-size:12.5px;font-weight:600;padding:3px 9px;border-color:var(--border);color:var(--text);}
+.btn-primary{font-weight:600;font-size:14px;padding:10px;}
+.icon-btn{border-radius:var(--radius-sm);}
+.icon-btn:hover{border-color:var(--accent);}
+.search-wrap input,.sel{background-color:var(--surface);border-color:var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);}
+.search-wrap input:focus,.sel:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--border);}
+.table-wrap{border-color:var(--border);border-radius:var(--radius);}
+.data-table thead th{font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:.05em;color:var(--text-2);background:var(--panel2);padding:6px 10px;border-bottom-color:var(--border);}
+.data-table tbody td{padding:6px 10px;font-size:13.5px;border-bottom-color:var(--border);}
+.data-table tbody tr:hover{background:var(--sel);}
+.data-table td.num{font-weight:500;}
+.cell-name{font-weight:600;}
+.status-pill,.tag{background:var(--chip);border:0;border-radius:10px;font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0;padding:1px 7px;}
+.status-pill.ok,.tag.ok{background:var(--chip);color:var(--ok);}
+.status-pill.is-bajo{background:var(--chip);color:var(--warn);}
+.status-pill.is-agotado,.tag.bad{background:var(--chip);color:var(--bad);}
+.tag.acc{background:var(--chip);color:var(--accent);}
+.section-title{font-family:var(--font-display);font-weight:600;font-size:17px;}
+.nav-badge{font-family:var(--font-mono);}
+.field label{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;}
+.field label.chk{display:flex;text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:500;color:var(--text);}
+.field input,.field select,.field textarea,.modal-input,.rc-line select,.rc-line input,.doc-table select,.doc-table input,.doc-table textarea{background-color:var(--surface);border-color:var(--border);border-radius:var(--radius-sm);text-transform:none;font-size:14px;}
+.field input:focus,.field select:focus,.field textarea:focus,.modal-input:focus,.rc-line select:focus,.rc-line input:focus,.doc-table select:focus,.doc-table input:focus,.doc-table textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--border);}
+.modal-input{font-family:var(--font-mono);font-weight:500;}
+.modal-box{border-radius:6px;}
+.modal-title{font-family:var(--font-display);font-weight:600;font-size:20px;}
+.modal-close{border-radius:var(--radius-sm);}
+.kx-table th,.doc-table th{font-family:var(--font-display);font-weight:600;font-size:12.5px;letter-spacing:.05em;color:var(--text-2);background:var(--panel2);}
+.kx-scroll{border-color:var(--border);border-radius:var(--radius);}
+.kx-card{background:var(--surface);border-radius:var(--radius);}
+.kx-card span{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--text-2);}
+.kx-card b{font-weight:500;font-size:20px;}
+.kx-warn,.kx-info,.banner-srv{border-radius:var(--radius-sm);border-left:3px solid currentColor;}
+.kx-info{border-left-color:var(--accent);}
+.card-box{border-radius:var(--radius);}
+.card-box h3{font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);}
+.toast{border-radius:var(--radius);}
+@media(max-width:760px){
+  .data-table tbody tr:hover{background:transparent;}
+  .data-table tbody td::before{font-family:var(--font-display);font-size:12.5px;font-weight:600;letter-spacing:.05em;color:var(--text-2);}
+  /* La tabla del detalle de un documento sigue siendo tabla (con scroll), no tarjetas */
+  .data-table .kx-table{display:table;}
+  .data-table .kx-table thead{display:table-header-group;}
+  .data-table .kx-table tbody{display:table-row-group;}
+  .data-table .kx-table tr{display:table-row;padding:0;border:0;}
+  .data-table .kx-table th,.data-table .kx-table td{display:table-cell;padding:6px 8px;border-bottom:1px solid var(--border);}
+  .data-table .kx-table td::before{display:none;}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
 <body>
 
 <div class="shell">
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark">AB</div>
-      <div>
-        <div class="brand-name">AutoBox</div>
-        <div class="brand-sub">Inventario</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
+  <header class="top"><div class="wrap">
+    <div class="brand">AutoBox · Inventario <small>taller</small></div>
+    <nav class="sidebar-nav" id="tabs">
       <button class="nav-item active" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
       <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')">Materiales</button>
       <button class="nav-item" id="tab-produccion" onclick="switchTab('produccion')">Producción<span class="nav-badge" id="pr-badge"></span></button>
+      <button class="nav-item" id="tab-documentos" onclick="switchTab('documentos')">Documentos</button>
       <button class="nav-item" id="tab-movimientos" onclick="switchTab('movimientos')">Movimientos</button>
+      <button class="nav-item" id="tab-bodegas" onclick="switchTab('bodegas')">Bodegas</button>
+      <button class="nav-item" id="tab-series" onclick="switchTab('series')">Series</button>
       <button class="nav-item" id="tab-alertas" onclick="switchTab('alertas')">Stock crítico<span class="nav-badge" id="al-badge"></span></button>
     </nav>
+  </div></header>
+
+  <main class="content wrap">
+    <div class="banner-srv" id="banner-srv" hidden>El Apps Script todavía no tiene la versión con documentos, bodegas y series. Mientras tanto <b>no se pueden registrar entradas, salidas ni fabricaciones</b>. Pega el <b>Codigo.gs</b> nuevo y publícalo como <b>Nueva versión</b>.</div>
     <div class="sidebar-stats">
       <div class="stat-group active" id="stats-maquinas">
         <div class="stat-title">Resumen</div>
@@ -272,6 +372,24 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         <div class="stat-row"><span>Se pueden armar</span><b class="mono" id="pr-armables">0</b></div>
         <div class="stat-row"><span>Sin componentes</span><b class="mono bad" id="pr-bloq">0</b></div>
       </div>
+      <div class="stat-group" id="stats-documentos">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Documentos</span><b class="mono" id="dc-total">0</b></div>
+        <div class="stat-row"><span>Este mes</span><b class="mono warn" id="dc-mes">0</b></div>
+        <div class="stat-row"><span>Anulados</span><b class="mono bad" id="dc-anulados">0</b></div>
+      </div>
+      <div class="stat-group" id="stats-bodegas">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Bodegas</span><b class="mono" id="bd-total">0</b></div>
+        <div class="stat-row"><span>Ítems fuera de la principal</span><b class="mono" id="bd-fuera">0</b></div>
+      </div>
+      <div class="stat-group" id="stats-series">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Series registradas</span><b class="mono" id="sr-total">0</b></div>
+        <div class="stat-row"><span>En bodega</span><b class="mono" id="sr-bodega">0</b></div>
+        <div class="stat-row"><span>Vendidas</span><b class="mono" id="sr-vendidas">0</b></div>
+        <div class="stat-row"><span>Instaladas</span><b class="mono" id="sr-instaladas">0</b></div>
+      </div>
       <div class="stat-group" id="stats-movimientos">
         <div class="stat-title">Resumen</div>
         <div class="stat-row"><span>Total</span><b class="mono" id="mv-total">0</b></div>
@@ -287,13 +405,6 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         <div class="stat-row"><span>Materiales</span><b class="mono" id="al-mt">0</b></div>
       </div>
     </div>
-    <div class="sidebar-sync">
-      <span class="led loading" id="sync-dot"></span>
-      <span id="sync-txt">Cargando</span>
-    </div>
-  </aside>
-
-  <main class="content">
 
     <!-- ═══ MÁQUINAS ═══ -->
     <div class="tab-panel active" id="panel-maquinas">
@@ -354,6 +465,28 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       </div>
     </div>
 
+    <!-- ═══ DOCUMENTOS ═══ -->
+    <div class="tab-panel" id="panel-documentos">
+      <div class="content-header">
+        <h1>Documentos</h1>
+        <button class="btn-new" onclick="abrirDoc()">+ Nuevo documento</button>
+      </div>
+      <div class="kx-sub" style="margin:-6px 0 14px;">Cada entrada, salida o fabricación queda con su número (ING-000001, VTA-000001…). Para corregir un error se <b>anula</b> el documento: se registra uno ANU que revierte el stock, y el kárdex lo deja de contar.</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input type="text" id="dc-search" placeholder="Buscar número, ítem, referencia o serie…" oninput="renderDocumentos()">
+        </div>
+        <select class="sel" id="dc-filtro" onchange="renderDocumentos()"></select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Documento</th><th>Fecha</th><th>Tipo</th><th>Referencia</th><th>Usuario</th><th class="num">Líneas</th><th class="num">Valor</th><th></th></tr></thead>
+          <tbody id="dc-list"><tr><td colspan="8" class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ═══ MOVIMIENTOS ═══ -->
     <div class="tab-panel" id="panel-movimientos">
       <div class="content-header">
@@ -370,11 +503,76 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Fecha</th><th>Ítem</th><th>Tipo</th><th>Motivo</th><th>Usuario</th><th class="num">Cantidad</th></tr></thead>
-          <tbody id="mv-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+          <thead><tr><th>Fecha</th><th>Documento</th><th>Ítem</th><th>Tipo</th><th>Motivo</th><th>Bodega</th><th>Usuario</th><th class="num">Cantidad</th></tr></thead>
+          <tbody id="mv-list"><tr><td colspan="8" class="empty-cell">Cargando…</td></tr></tbody>
         </table>
       </div>
       <button class="btn-secondary" onclick="exportarExcel('movimientos')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg> Exportar a Excel</button>
+    </div>
+
+    <!-- ═══ BODEGAS ═══ -->
+    <div class="tab-panel" id="panel-bodegas">
+      <div class="content-header">
+        <h1>Bodegas</h1>
+        <button class="btn-new" onclick="abrirDoc('transferencia')">+ Transferencia</button>
+      </div>
+      <div class="kx-sub" style="margin:-6px 0 14px;">Stock de cada ítem por bodega. Lo que se registró antes de las bodegas cuenta como <b>BOD</b> (bodega principal).</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input type="text" id="bd-search" placeholder="Buscar ítem…" oninput="renderBodegas()">
+        </div>
+        <select class="sel" id="bd-filtro" onchange="renderBodegas()">
+          <option value="all">Máquinas y materiales</option>
+          <option value="maquina">Solo máquinas</option>
+          <option value="material">Solo materiales</option>
+        </select>
+      </div>
+      <div class="table-wrap" style="overflow-x:auto;">
+        <table class="data-table">
+          <thead id="bd-head"></thead>
+          <tbody id="bd-list"><tr><td class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card-box">
+        <h3>Lista de bodegas</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Código</th><th>Nombre</th><th class="num">Ítems con stock</th><th></th></tr></thead>
+            <tbody id="bd-cods"></tbody>
+          </table>
+        </div>
+        <div class="inline-form">
+          <div class="field"><label>Código (hasta 8)</label><input type="text" id="bd-cod" maxlength="8" placeholder="TAL"/></div>
+          <div class="field" style="flex:2 1 200px;"><label>Nombre</label><input type="text" id="bd-nom" maxlength="40" placeholder="Taller de armado" style="text-transform:none;"/></div>
+          <button class="btn-sm primary" id="btn-bd" onclick="guardarBodega()">Agregar bodega</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SERIES ═══ -->
+    <div class="tab-panel" id="panel-series">
+      <div class="content-header">
+        <h1>Series</h1>
+        <button class="btn-new" onclick="abrirActivarSerie()">+ Controlar por serie</button>
+      </div>
+      <div class="kx-sub" style="margin:-6px 0 14px;">Dónde está cada unidad con número de serie y por qué documentos pasó. Al fabricar, los componentes con serie quedan registrados <b>en</b> la máquina.</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input type="text" id="sr-search" placeholder="Buscar serie o ítem…" oninput="renderSeries()">
+        </div>
+        <select class="sel" id="sr-estado" onchange="renderSeries()">
+          <option value="">Todos los estados</option>
+          <option>En bodega</option><option>Vendida</option><option>Instalada</option><option>Dada de baja</option><option>Salida</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Serie</th><th>Ítem</th><th>Estado</th><th>Dónde / detalle</th><th>Último documento</th><th></th></tr></thead>
+          <tbody id="sr-list"><tr><td colspan="6" class="empty-cell">Cargando…</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- ═══ STOCK CRÍTICO ═══ -->
@@ -413,6 +611,13 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
     </div>
 
   </main>
+  <footer class="bar"><div class="wrap">
+    <span class="teclas"><span class="key">F9</span> buscar · <span class="key">F10</span> guardar / nuevo · <span class="key">Esc</span> cerrar</span>
+    <div class="sidebar-sync">
+      <span class="led loading" id="sync-dot"></span>
+      <span id="sync-txt">Cargando</span>
+    </div>
+  </div></footer>
 </div>
 
 <!-- MODAL NUEVA MÁQUINA -->
@@ -461,6 +666,13 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
       <div class="field">
         <label>Nota (opcional)</label>
         <input type="text" id="mq-nota" placeholder="Color, variante, precio referencial…" maxlength="100"/>
+      </div>
+      <div class="field">
+        <label class="chk" style="margin-bottom:0;"><input type="checkbox" id="mq-serie" onchange="document.getElementById('mq-series-wrap').hidden=!this.checked"> Controla número de serie (cada unidad con su número)</label>
+      </div>
+      <div class="field" id="mq-series-wrap" hidden>
+        <label>Series del stock inicial (una por línea)</label>
+        <textarea id="mq-series" rows="3" placeholder="Ej: AB-0001"></textarea>
       </div>
       <div class="field">
         <label>Registrado por</label>
@@ -552,6 +764,13 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         <input type="text" id="mt-nota" placeholder="Proveedor, referencia, voltaje, modelo…" maxlength="100"/>
       </div>
       <div class="field">
+        <label class="chk" style="margin-bottom:0;"><input type="checkbox" id="mt-serie" onchange="document.getElementById('mt-series-wrap').hidden=!this.checked"> Controla número de serie (cada unidad con su número)</label>
+      </div>
+      <div class="field" id="mt-series-wrap" hidden>
+        <label>Series del stock inicial (una por línea)</label>
+        <textarea id="mt-series" rows="3" placeholder="Ej: AB-0001"></textarea>
+      </div>
+      <div class="field">
         <label>Registrado por</label>
         <select id="mt-usuario">
           <option value="Danny">👤 Danny</option>
@@ -583,6 +802,21 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
           <option value="dano">⚠️ Daño/Pérdida</option>
         </select>
       </div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Bodega</label>
+        <select class="modal-input" id="modal-bod" onchange="renderModalSeries()" style="text-align:left;font-family:var(--font-ui);font-size:0.8rem;font-weight:500;text-transform:none;"></select>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Referencia</label>
+        <input type="text" class="modal-input" id="modal-ref" placeholder="Factura, cliente…" maxlength="80" style="text-align:left;font-family:var(--font-ui);font-size:0.8rem;font-weight:500;"/>
+      </div>
+    </div>
+    <div class="field" id="modal-ser-wrap" style="margin-bottom:12px;" hidden>
+      <label id="modal-ser-label">Series</label>
+      <textarea id="modal-ser" rows="2" placeholder="Una por línea"></textarea>
+      <div class="picks" id="modal-picks"></div>
     </div>
     <div class="field" id="modal-costo-wrap" style="margin-bottom:12px;">
       <label>Costo unitario ($)</label>
@@ -634,6 +868,20 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
         </select>
       </div>
     </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Componentes salen de</label>
+        <select id="fab-bo" onchange="renderFabricar()"></select>
+      </div>
+      <div class="field">
+        <label>Máquina entra a</label>
+        <select id="fab-bd"></select>
+      </div>
+    </div>
+    <div class="field" id="fab-ser-wrap" hidden>
+      <label>Series de las máquinas (una por línea)</label>
+      <textarea id="fab-ser" rows="2" placeholder="Ej: AB-0001"></textarea>
+    </div>
     <div id="fab-warns"></div>
     <div class="kx-scroll">
       <table class="kx-table narrow">
@@ -644,6 +892,86 @@ table.kx-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.78
     <div class="rc-total"><span>Costo por máquina</span><b class="mono" id="fab-costo">$0.00</b></div>
     <div class="fab-progress" id="fab-progress"></div>
     <button class="btn-primary" id="btn-fab" onclick="confirmarFabricacion()">Descontar componentes y sumar máquina</button>
+  </div>
+</div>
+
+<!-- MODAL DOCUMENTO -->
+<div class="modal-overlay" id="modal-doc" hidden onclick="if(event.target===this&&!docOcupado)cerrarDoc()">
+  <div class="modal-box wide" style="max-width:960px;">
+    <div class="modal-head"><div class="modal-title">Nuevo documento</div><button class="modal-close" onclick="cerrarDoc()">×</button></div>
+    <div class="form-row">
+      <div class="field">
+        <label>Tipo</label>
+        <select id="doc-tipo" onchange="docCambio()"></select>
+      </div>
+      <div class="field">
+        <label>Registrado por</label>
+        <select id="doc-usuario">
+          <option value="Danny">👤 Danny</option>
+          <option value="Tatiana">👤 Tatiana</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label id="doc-bod-label">Bodega</label>
+        <select id="doc-bod" onchange="docCambio()"></select>
+      </div>
+      <div class="field" id="doc-dest-wrap">
+        <label>Bodega destino</label>
+        <select id="doc-dest"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Referencia</label>
+      <input type="text" id="doc-ref" maxlength="80" placeholder="Factura, proveedor, cliente, trabajo…" style="text-transform:none;"/>
+    </div>
+    <div class="modal-hint" id="doc-hint"></div>
+    <div class="kx-scroll">
+      <table class="doc-table">
+        <thead><tr><th style="width:34%;">Ítem</th><th>Disponible</th><th style="width:96px;">Cantidad</th><th style="width:110px;" id="doc-costo-h">Costo unit.</th><th style="width:30%;">Series</th><th style="width:30px;"></th></tr></thead>
+        <tbody id="doc-lines"></tbody>
+      </table>
+    </div>
+    <button class="btn-sm" style="margin:8px 0 0;" onclick="agregarLineaDoc()">+ Agregar línea</button>
+    <div class="rc-total"><span>Valor del documento</span><b class="mono" id="doc-total">$0.00</b></div>
+    <button class="btn-primary" id="btn-doc" onclick="guardarDoc()">Guardar documento</button>
+  </div>
+</div>
+
+<!-- MODAL HISTORIA DE SERIE -->
+<div class="modal-overlay" id="modal-sr" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="modal-box wide" style="max-width:820px;">
+    <div class="modal-head"><div class="modal-title" id="sr-title">Serie</div><button class="modal-close" onclick="document.getElementById('modal-sr').hidden=true">×</button></div>
+    <div class="kx-sub" id="sr-sub"></div>
+    <div class="kx-scroll">
+      <table class="kx-table narrow">
+        <thead><tr><th class="l">Fecha</th><th class="l">Documento</th><th class="l">Movimiento</th><th class="l">Bodega</th><th class="l">Detalle</th><th class="l">Usuario</th></tr></thead>
+        <tbody id="sr-hist"></tbody>
+      </table>
+    </div>
+    <div id="sr-dentro"></div>
+  </div>
+</div>
+
+<!-- MODAL ACTIVAR SERIE -->
+<div class="modal-overlay" id="modal-act" hidden onclick="if(event.target===this&&!actOcupado)this.hidden=true">
+  <div class="modal-box form" style="max-width:560px;">
+    <div class="modal-head"><div class="modal-title">Controlar por número de serie</div><button class="modal-close" onclick="document.getElementById('modal-act').hidden=true">×</button></div>
+    <div class="kx-sub">Desde ahora cada entrada y salida de este ítem pedirá sus números de serie. Si ya tiene stock, escribe las series de las unidades que hay en cada bodega (queda registrado como documento SER).</div>
+    <div class="field">
+      <label>Ítem</label>
+      <select id="act-item" onchange="renderActivarSerie()"></select>
+    </div>
+    <div id="act-bods"></div>
+    <div class="field">
+      <label>Registrado por</label>
+      <select id="act-usuario">
+        <option value="Danny">👤 Danny</option>
+        <option value="Tatiana">👤 Tatiana</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="btn-act" onclick="confirmarActivarSerie()">Activar control por serie</button>
   </div>
 </div>
 
@@ -787,6 +1115,8 @@ function jsonpRaw(params,timeoutMs){
     s.onerror=()=>{limpiar();reject(new Error('Error de red'));};
     const qs=Object.entries({...params,callback:cb,t:Date.now()}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
     s.src=SCRIPT_URL+'?'+qs;
+    // Google rechaza URLs muy largas (un documento con demasiadas líneas o series)
+    if(s.src.length>8000){limpiar();reject(new Error('Documento demasiado largo: divídelo en dos'));return;}
     document.head.appendChild(s);
   });
 }
@@ -797,26 +1127,36 @@ const jsonpGet=jsonp, jsonpAction=jsonp;
 function normItems(lista){
   return (Array.isArray(lista)?lista:[]).map(i=>({...i,id:String(i.id),nombre:String(i.nombre??''),
     stock:Number(i.stock)||0,stock_minimo:Number(i.stock_minimo)||0,
-    precio_venta:costoValido(i.precio_venta)?Number(i.precio_venta):''}));
+    precio_venta:costoValido(i.precio_venta)?Number(i.precio_venta):'',
+    serie:i.serie===true||String(i.serie)==='1'}));
 }
 function normMovs(lista){
-  return (Array.isArray(lista)?lista:[]).map(m=>({...m,item_id:String(m.item_id),item_nombre:String(m.item_nombre??''),delta:Number(m.delta)||0}));
+  return (Array.isArray(lista)?lista:[]).map(m=>({...m,id:String(m.id),item_id:String(m.item_id),item_nombre:String(m.item_nombre??''),delta:Number(m.delta)||0,
+    doc:String(m.doc||''),bodega:String(m.bodega||'').toUpperCase(),ref:String(m.ref||''),anulado:String(m.anulado||''),
+    series:Array.isArray(m.series)?m.series:parseSeries(m.series)}));
 }
 
 async function cargarTodo(){
   setSyncStatus('loading','Cargando…');
   try{
-    const [mq,mt,mv]=await Promise.all([
+    const [mq,mt,mv,bd]=await Promise.all([
       jsonpGet({tipo:'maquina'}),
       jsonpGet({tipo:'material'}),
       jsonpGet({action:'get_movimientos'}),
+      jsonpGet({action:'get_bodegas'}).catch(e=>({__error:e})),
     ]);
+    // Un Apps Script viejo no conoce get_bodegas: se puede ver el inventario, pero no registrar
+    if(bd&&bd.__error){
+      if(!/desconocida/i.test(bd.__error.message))throw bd.__error;
+      servidorNuevo=false;
+    }else{
+      servidorNuevo=true;
+      bodegas=normBodegas(bd.bodegas);
+    }
     maquinas=normItems(mq);
     materiales=normItems(mt);
     movimientos=normMovs(mv);
-    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
-    localStorage.setItem('inv_mt',JSON.stringify(materiales));
-    localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+    guardarLocal();
     const hora=new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
     setSyncStatus('ok','Sincronizado · '+hora);
     render();
@@ -826,6 +1166,7 @@ async function cargarTodo(){
     maquinas=normItems(leerJSON('inv_mq',[]));
     materiales=normItems(leerJSON('inv_mt',[]));
     movimientos=normMovs(leerJSON('inv_mv',[]));
+    bodegas=normBodegas(leerJSON('inv_bd',[]));
     render();
     toast((porClave?e.message:'Sin conexión')+'. Mostrando datos locales.','error');
   }
@@ -854,7 +1195,8 @@ function fechaHoy(){
 function costoValido(v){return v!==''&&v!==null&&v!==undefined&&!isNaN(Number(v))&&Number(v)>=0;}
 
 // ── KÁRDEX (costo promedio ponderado) ────────────────────
-const MOTIVOS={compra:'Compra',devolucion:'Devolución',ajuste:'Ajuste de inventario',venta:'Venta',uso_produccion:'Uso en producción',dano:'Daño/Pérdida',produccion:'Fabricación'};
+const MOTIVOS={compra:'Compra',devolucion:'Devolución',ajuste:'Ajuste de inventario',venta:'Venta',uso_produccion:'Uso en producción',dano:'Daño/Pérdida',produccion:'Fabricación',
+  stock_inicial:'Stock inicial',transferencia:'Transferencia',anulacion:'Anulación',registro_series:'Registro de series'};
 
 // Recorre los movimientos en orden cronológico (orden de la hoja) y arma el kárdex de cada ítem.
 // Entrada: suma cantidad y valor, recalcula el promedio. Si no trae costo, entra al promedio vigente.
@@ -864,13 +1206,15 @@ const MOTIVOS={compra:'Compra',devolucion:'Devolución',ajuste:'Ajuste de invent
 function calcKardexAll(){
   const map={};
   const costoRecetaDe=id=>(recetas[String(id)]||[]).reduce((s,l)=>s+l.cantidad*((map['material:'+String(l.material_id)]||{}).prom||0),0);
-  const movsMaq=movimientos.filter(m=>m.tipo==='maquina');
-  movimientos.filter(m=>m.tipo!=='maquina').concat(movsMaq).forEach(m=>{
+  // Lo anulado (y su anulación) y las transferencias, que no cambian el costo, no entran al kárdex
+  const activos=movimientos.filter(m=>movActivo(m)&&m.motivo!=='transferencia');
+  const movsMaq=activos.filter(m=>m.tipo==='maquina');
+  activos.filter(m=>m.tipo!=='maquina').concat(movsMaq).forEach(m=>{
     const key=m.tipo+':'+String(m.item_id);
     const k=map[key]||(map[key]={rows:[],q:0,v:0,prom:0,sinCosto:0,negativo:false});
     const delta=Number(m.delta)||0;
     if(!delta)return;
-    const row={fecha:m.fecha||'—',motivo:MOTIVOS[m.motivo]||m.motivo||'—',usuario:m.usuario||'—'};
+    const row={fecha:m.fecha||'—',motivo:MOTIVOS[m.motivo]||m.motivo||'—',usuario:m.usuario||'—',doc:m.doc||''};
     if(delta>0){
       const tieneCosto=costoValido(m.costo_unitario);
       const porReceta=!tieneCosto&&m.tipo==='maquina'&&(recetas[String(m.item_id)]||[]).length>0;
@@ -920,7 +1264,7 @@ function abrirKardex(id,tipo){
     const n=v=>v===undefined?'':v;
     el.innerHTML=k.rows.map(r=>'<tr>'+
       '<td class="l">'+escHtml(r.fecha)+'</td>'+
-      '<td class="l">'+escHtml(r.motivo)+(r.sinCosto?'<span class="kx-flag">sin costo</span>':'')+(r.porReceta?'<span class="kx-flag">costo de receta</span>':'')+'</td>'+
+      '<td class="l">'+escHtml(r.motivo)+(r.doc?' <span style="color:var(--text-3);">'+escHtml(r.doc)+'</span>':'')+(r.sinCosto?'<span class="kx-flag">sin costo</span>':'')+(r.porReceta?'<span class="kx-flag">costo de receta</span>':'')+'</td>'+
       '<td class="l">'+escHtml(r.usuario)+'</td>'+
       '<td class="g in">'+n(r.inQ)+'</td><td class="in">'+(r.inQ?fmtCosto(r.inCu):'')+'</td><td class="in">'+(r.inQ?fmtMoney(r.inT):'')+'</td>'+
       '<td class="g out">'+n(r.outQ)+'</td><td class="out">'+(r.outQ?fmtCosto(r.outCu):'')+'</td><td class="out">'+(r.outQ?fmtMoney(r.outT):'')+'</td>'+
@@ -947,7 +1291,7 @@ function exportarKardex(){
     ['Fecha','Detalle','Usuario','Cant.','C. unit.','Total','Cant.','C. unit.','Total','Cant.','C. prom.','Valor'],
   ];
   k.rows.forEach(r=>det.push([
-    r.fecha,r.motivo+(r.sinCosto?' (sin costo)':'')+(r.porReceta?' (costo de receta)':''),r.usuario,
+    r.fecha,r.motivo+(r.doc?' '+r.doc:'')+(r.sinCosto?' (sin costo)':'')+(r.porReceta?' (costo de receta)':''),r.usuario,
     r.inQ??'',r.inQ?r4(r.inCu):'',r.inQ?r2(r.inT):'',
     r.outQ??'',r.outQ?r4(r.outCu):'',r.outQ?r2(r.outT):'',
     r.q,r4(r.prom),r2(r.v),
@@ -1154,6 +1498,10 @@ function abrirFabricar(maquinaId){
   const lastUser=localStorage.getItem('inv_usuario');
   if(lastUser)document.getElementById('fab-usuario').value=lastUser;
   document.getElementById('fab-progress').textContent='';
+  document.getElementById('fab-bo').innerHTML=opcionesBodega(BOD_PRINCIPAL);
+  document.getElementById('fab-bd').innerHTML=opcionesBodega(BOD_PRINCIPAL);
+  document.getElementById('fab-ser').value='';
+  document.getElementById('fab-ser-wrap').hidden=!mq.serie;
   renderFabricar();
   document.getElementById('modal-fab').hidden=false;
 }
@@ -1165,17 +1513,26 @@ function renderFabricar(){
   if(!fabData)return;
   const n=Math.floor(Number(document.getElementById('fab-qty').value)||0);
   const rc=getReceta(fabData.maquinaId);
-  let faltan=0,huerfanos=0,sinCosto=0;
+  const bo=document.getElementById('fab-bo').value||BOD_PRINCIPAL;
+  let faltan=0,huerfanos=0,sinCosto=0,sinSerie=0;
   document.getElementById('fab-list').innerHTML=rc.map(l=>{
     const m=getMaterial(l.material_id);
     if(!m){huerfanos++;return '<tr class="falta"><td class="l" colspan="6">Material eliminado (id '+escHtml(l.material_id)+'): edita la receta</td></tr>';}
     const prom=getKardex('material',m.id).prom;
     if(!prom)sinCosto++;
-    const nec=r4(l.cantidad*n), stock=Number(m.stock)||0, queda=r4(stock-nec);
+    const nec=r4(l.cantidad*n), stock=stockBod('material',m.id,bo), queda=r4(stock-nec);
     if(queda<0)faltan++;
+    // Componentes con serie: salen las primeras series disponibles en la bodega
+    let nota='',faltaSerie=false;
+    if(m.serie&&queda>=0&&nec>0){
+      const disp=seriesEn('material',m.id,bo);
+      faltaSerie=!Number.isInteger(nec)||disp.length<nec;
+      if(faltaSerie)sinSerie++;
+      nota='<span class="cell-note"'+(faltaSerie?' style="color:var(--bad);"':'')+'>'+(faltaSerie?'Faltan series: hay '+disp.length+' registradas en '+escHtml(bo):'Series: '+escHtml(disp.slice(0,nec).join(', ')))+'</span>';
+    }
     const u=escHtml(m.unidad||'unidad');
-    return '<tr'+(queda<0?' class="falta"':'')+'>'+
-      '<td class="l">'+escHtml(m.nombre)+'</td>'+
+    return '<tr'+(queda<0||faltaSerie?' class="falta"':'')+'>'+
+      '<td class="l">'+escHtml(m.nombre)+nota+'</td>'+
       '<td>'+l.cantidad+' '+u+'</td>'+
       '<td class="out">'+nec+'</td>'+
       '<td>'+stock+'</td>'+
@@ -1185,37 +1542,66 @@ function renderFabricar(){
   }).join('');
   const w=[];
   if(huerfanos)w.push('<div class="kx-warn bad">La receta tiene componentes que ya no existen. Edítala antes de fabricar.</div>');
-  if(faltan)w.push('<div class="kx-warn bad">Faltan '+faltan+' componente(s) para '+n+' máquina(s). Registra primero la entrada de lo que compraste, o baja la cantidad. Se pueden armar: <b>'+armables(rc)+'</b>.</div>');
+  if(faltan)w.push('<div class="kx-warn bad">Faltan '+faltan+' componente(s) para '+n+' máquina(s). Registra primero la entrada de lo que compraste, pásalo con una transferencia o baja la cantidad. Se pueden armar en '+escHtml(bo)+': <b>'+armablesEn(rc,bo)+'</b>.</div>');
+  if(sinSerie)w.push('<div class="kx-warn bad">'+sinSerie+' componente(s) con serie no tienen suficientes series registradas en '+escHtml(bo)+'. Regístralas en la pestaña Series.</div>');
   if(sinCosto)w.push('<div class="kx-warn">'+sinCosto+' componente(s) sin costo en el kárdex: el costo de la máquina saldrá incompleto.</div>');
   document.getElementById('fab-warns').innerHTML=w.join('');
   document.getElementById('fab-costo').textContent=fmtMoney(costoReceta(rc));
-  document.getElementById('btn-fab').disabled=fabOcupado||n<1||faltan>0||huerfanos>0;
+  document.getElementById('btn-fab').disabled=fabOcupado||n<1||faltan>0||huerfanos>0||sinSerie>0;
 }
 
+// Toda la fabricación va en un solo documento PRD: el Apps Script descuenta los componentes y suma
+// la máquina juntos, así que nunca queda a medias.
 async function confirmarFabricacion(){
   if(!fabData||fabOcupado)return;
   const n=Math.floor(Number(document.getElementById('fab-qty').value)||0);
   const mq=getMaquina(fabData.maquinaId);
   const rc=getReceta(fabData.maquinaId);
   if(!mq||n<1)return;
-  if(rc.some(l=>{const m=getMaterial(l.material_id);return !m||(Number(m.stock)||0)<l.cantidad*n-1e-9;})){renderFabricar();return;}
+  const bo=document.getElementById('fab-bo').value||BOD_PRINCIPAL;
+  const bd=document.getElementById('fab-bd').value||BOD_PRINCIPAL;
+  if(rc.some(l=>{const m=getMaterial(l.material_id);return !m||stockBod('material',m.id,bo)<l.cantidad*n-1e-9;})){renderFabricar();return;}
+  const maqSer=mq.serie?parseSeries(document.getElementById('fab-ser').value):[];
+  if(mq.serie){const e=errorSeriesEntrada(mq,n,maqSer);if(e){toast(e,'error');return;}}
+  try{exigirServidorNuevo();}catch(e){toast(e.message,'error');return;}
   const usuario=document.getElementById('fab-usuario').value;
   localStorage.setItem('inv_usuario',usuario);
-  const base=Date.now();
+  const en='En '+(maqSer.length?maqSer.join(', '):mq.nombre);
   // Componentes primero; la máquina al final, con el costo de lo consumido (promedio del kárdex).
-  const lineas=rc.map((l,i)=>{
+  const lineas=[];
+  for(const l of rc){
     const m=getMaterial(l.material_id);
-    return {mv_id:(base+i).toString(),tipo:'material',item_id:String(m.id),item_nombre:m.nombre,delta:-r4(l.cantidad*n),
-      motivo:'uso_produccion',costo_unitario:r4(getKardex('material',m.id).prom),paso:'stock'};
-  });
-  lineas.push({mv_id:(base+rc.length).toString(),tipo:'maquina',item_id:String(mq.id),item_nombre:mq.nombre,delta:n,
-    motivo:'produccion',costo_unitario:r4(costoReceta(rc)),paso:'stock'});
-  const lote={id:base.toString(),maquina_nombre:mq.nombre,n,usuario,lineas};
-  const pend=leerJSON('inv_fab_pend',[]);pend.push(lote);
-  localStorage.setItem('inv_fab_pend',JSON.stringify(pend));
-  await procesarLote(lote);
+    const nec=r4(l.cantidad*n);
+    let series=[];
+    if(m.serie){
+      series=seriesEn('material',m.id,bo).slice(0,nec);
+      if(!Number.isInteger(nec)||series.length!==nec){renderFabricar();return;}
+    }
+    lineas.push({tipo:'material',item_id:m.id,delta:-nec,motivo:'uso_produccion',costo:r4(getKardex('material',m.id).prom),bodega:bo,series,ref:en});
+  }
+  lineas.push({tipo:'maquina',item_id:mq.id,delta:n,motivo:'produccion',costo:r4(costoReceta(rc)),bodega:bd,series:maqSer});
+  fabOcupado=true;
+  const btn=document.getElementById('btn-fab');btn.disabled=true;btn.textContent='Guardando…';
+  setSyncStatus('loading','Guardando fabricación…');
+  renderProduccion();
+  try{
+    const num=await enviarDoc('PRD',lineas,'Fabricación '+mq.nombre+' ×'+n,usuario);
+    fabOcupado=false;
+    document.getElementById('modal-fab').hidden=true;fabData=null;
+    render();
+    syncOk();
+    toast(mq.nombre+' ×'+n+' fabricada · '+num+' ✓','success');
+  }catch(e){
+    setSyncStatus('error','Error al fabricar');
+    toast('No se fabricó (no se descontó nada): '+e.message,'error');
+  }finally{
+    fabOcupado=false;
+    btn.textContent='Descontar componentes y sumar máquina';
+    renderProduccion();renderFabricar();
+  }
 }
 
+// Fabricaciones de la versión anterior (una llamada por componente) que quedaron pendientes en este navegador
 function guardarLote(lote){
   const pend=leerJSON('inv_fab_pend',[]).filter(l=>l.id!==lote.id);
   if(lote.lineas.some(x=>x.paso!=='done'))pend.push(lote);
@@ -1235,7 +1621,7 @@ async function procesarLinea(lote,x){
   if(x.paso==='mov'){
     const mv={id:x.mv_id,tipo:x.tipo,item_id:x.item_id,item_nombre:x.item_nombre,delta:x.delta,motivo:x.motivo,usuario:lote.usuario,costo_unitario:x.costo_unitario};
     await jsonp({action:'add_movimiento',...mv});
-    movimientos.push({...mv,fecha:fechaHoy()});
+    movimientos.push(...normMovs([{...mv,fecha:fechaHoy()}]));
     x.paso='done';guardarLote(lote);
   }
 }
@@ -1293,10 +1679,559 @@ function descartarLote(id){
   renderProduccion();
 }
 
+// ── DOCUMENTOS, BODEGAS Y SERIES ─────────────────────────
+// Todas las entradas y salidas se guardan como documentos (registrar_doc): el Apps Script valida el
+// stock, asigna el número (ING-000001…) y escribe todas las líneas juntas, todo o nada.
+const BOD_PRINCIPAL='BOD';
+const TIPOS_DOC={ING:'Compra',DEV:'Devolución',AJU:'Ajuste',VTA:'Venta',EGR:'Egreso',TRF:'Transferencia',PRD:'Fabricación',INI:'Stock inicial',SER:'Registro de series',ANU:'Anulación'};
+// Motivo de la ventana de entrada/salida → tipo de documento
+const DOC_DE_MOTIVO={compra:'ING',devolucion:'DEV',ajuste:'AJU',venta:'VTA',uso_produccion:'EGR',dano:'EGR'};
+const ESTADO_SERIE={venta:'Vendida',uso_produccion:'Instalada',dano:'Dada de baja',ajuste:'Dada de baja'};
+let bodegas=[{codigo:BOD_PRINCIPAL,nombre:'Bodega principal'}];
+let servidorNuevo=null;   // false = el Apps Script es la versión anterior (sin registrar_doc)
+let bodCache={}, seriesCache={}, docsCache=[];
+
+// Un movimiento anulado y su anulación se compensan: no cuentan para kárdex, bodegas ni series
+function movActivo(m){return !m.anulado&&m.motivo!=='anulacion';}
+function getItem(tipo,id){return tipo==='maquina'?getMaquina(id):getMaterial(id);}
+function nombreBodega(c){return (bodegas.find(b=>b.codigo===c)||{}).nombre||c;}
+function opcionesBodega(sel){return bodegas.map(b=>'<option value="'+escHtml(b.codigo)+'"'+(b.codigo===sel?' selected':'')+'>'+escHtml(b.codigo)+' · '+escHtml(b.nombre)+'</option>').join('');}
+function normBodegas(lista){
+  const out=(Array.isArray(lista)?lista:[]).map(b=>({codigo:String(b.codigo).toUpperCase(),nombre:String(b.nombre||b.codigo)}));
+  if(!out.some(b=>b.codigo===BOD_PRINCIPAL))out.unshift({codigo:BOD_PRINCIPAL,nombre:'Bodega principal'});
+  return out;
+}
+function parseSeries(t){return String(t||'').split(/[\n,;]+/).map(x=>x.trim().toUpperCase()).filter(Boolean);}
+function guardarLocal(){
+  localStorage.setItem('inv_mq',JSON.stringify(maquinas));
+  localStorage.setItem('inv_mt',JSON.stringify(materiales));
+  localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+  localStorage.setItem('inv_bd',JSON.stringify(bodegas));
+}
+function syncOk(){setSyncStatus('ok','Sincronizado · '+new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'}));}
+
+// Stock por bodega: cada bodega suma sus movimientos y la principal es lo que queda del stock total.
+// Así lo registrado antes de las bodegas (sin bodega) cuenta como BOD.
+function calcBodegas(){
+  const map={};
+  movimientos.forEach(m=>{
+    const b=m.bodega||BOD_PRINCIPAL;
+    if(!movActivo(m)||b===BOD_PRINCIPAL||!m.delta)return;
+    const k=m.tipo+':'+m.item_id;
+    (map[k]=map[k]||{})[b]=r4((map[k][b]||0)+m.delta);
+  });
+  return map;
+}
+function stockBod(tipo,id,b){
+  const it=getItem(tipo,id);if(!it)return 0;
+  const otras=bodCache[tipo+':'+String(id)]||{};
+  if(b!==BOD_PRINCIPAL)return otras[b]||0;
+  return r4((Number(it.stock)||0)-Object.values(otras).reduce((s,v)=>s+v,0));
+}
+function armablesEn(receta,b){
+  if(!receta.length)return 0;
+  return Math.min(...receta.map(l=>{
+    const m=getMaterial(l.material_id);
+    return m?Math.floor(stockBod('material',m.id,b)/l.cantidad+1e-9):0;
+  }));
+}
+
+// Estado de cada serie: se recorren los movimientos en orden y el último decide dónde está
+function calcSeries(){
+  const map={};
+  movimientos.forEach(m=>{
+    if(!movActivo(m)||!m.series.length)return;
+    const b=m.bodega||BOD_PRINCIPAL;
+    m.series.forEach(s=>{
+      const r=map[s]||(map[s]={serie:s,hist:[]});
+      r.tipo=m.tipo;r.item_id=m.item_id;r.item_nombre=m.item_nombre;
+      if(m.delta>0||m.motivo==='registro_series'){r.bod=b;r.estado='En bodega';r.det='';}
+      else{r.bod=null;r.estado=ESTADO_SERIE[m.motivo]||'Salida';r.det=m.ref||'';}
+      r.doc=m.doc;r.fecha=m.fecha;
+      r.hist.push({fecha:m.fecha,doc:m.doc,motivo:m.motivo,bod:b,delta:m.delta,ref:m.ref||'',usuario:m.usuario||''});
+    });
+  });
+  return map;
+}
+function seriesEn(tipo,id,b){
+  return Object.values(seriesCache).filter(r=>r.tipo===tipo&&r.item_id===String(id)&&r.bod===b).map(r=>r.serie).sort();
+}
+// Series de una entrada: cantidad entera, una serie por unidad, sin repetir y que no estén ya en una bodega
+function errorSeriesEntrada(item,qty,series){
+  if(!Number.isInteger(qty))return item.nombre+' se controla por serie: la cantidad debe ser entera';
+  if(series.length!==qty)return item.nombre+': son '+qty+' unidad(es) y escribiste '+series.length+' serie(s)';
+  if(new Set(series).size!==series.length)return item.nombre+': hay series repetidas';
+  const ya=series.find(s=>seriesCache[s]&&seriesCache[s].bod);
+  if(ya)return 'La serie '+ya+' ya está en '+seriesCache[ya].bod;
+  return '';
+}
+
+function exigirServidorNuevo(){
+  if(servidorNuevo===false)throw new Error('El Apps Script no está actualizado (pega el Codigo.gs nuevo y publícalo como Nueva versión)');
+}
+// lineas: [{tipo, item_id, delta, motivo, costo, bodega, series:[], ref}]. Devuelve el número del documento.
+async function enviarDoc(tipoDoc,lineas,ref,usuario){
+  exigirServidorNuevo();
+  // Listas en vez de objetos y sin los campos vacíos del final: la petición va en la URL
+  const L=lineas.map(l=>{
+    const a=[l.tipo==='maquina'?'mq':'mt',String(l.item_id),r4(l.delta),l.motivo||'',costoValido(l.costo)?r4(Number(l.costo)):'',
+      l.bodega||BOD_PRINCIPAL,(l.series||[]).join(','),l.ref||''];
+    while(a.length>3&&a[a.length-1]==='')a.pop();
+    return a;
+  });
+  const d=await jsonp({action:'registrar_doc',tipo_doc:tipoDoc,usuario,ref:ref||'',lineas:JSON.stringify(L)});
+  aplicarRespuesta(d);
+  return d.doc;
+}
+// Suma al estado local lo que devolvió el servidor: movimientos nuevos, stock y anulados
+function aplicarRespuesta(d){
+  normMovs(d.movs||[]).forEach(m=>movimientos.push(m));
+  Object.entries(d.stocks||{}).forEach(([k,v])=>{const i=k.indexOf(':');const it=getItem(k.slice(0,i),k.slice(i+1));if(it)it.stock=Number(v)||0;});
+  (d.anulados||[]).forEach(id=>{const m=movimientos.find(x=>x.id===String(id));if(m)m.anulado=d.doc;});
+  guardarLocal();
+  render();
+}
+
+// ── Lista de documentos ──
+// Los movimientos de antes no tienen número: cada uno es su propio "documento", salvo las fabricaciones,
+// cuyos componentes tienen ids seguidos al de la máquina.
+function agruparDocs(){
+  const porId={};movimientos.forEach(m=>{porId[m.id]=m;});
+  const grupoLegado={};
+  movimientos.forEach(m=>{
+    if(m.doc||m.tipo!=='maquina'||m.motivo!=='produccion')return;
+    for(let k=1;;k++){
+      const c=porId[String(Number(m.id)-k)];
+      if(!c||c.doc||c.motivo!=='uso_produccion'||c.fecha!==m.fecha)break;
+      grupoLegado[c.id]='L:'+m.id;
+    }
+  });
+  const g=new Map();
+  movimientos.forEach(m=>{
+    const key=m.doc?'D:'+m.doc:(grupoLegado[m.id]||'L:'+m.id);
+    if(!g.has(key))g.set(key,{key,doc:m.doc,fecha:m.fecha,usuario:m.usuario,movs:[]});
+    g.get(key).movs.push(m);
+  });
+  return [...g.values()].map(d=>{
+    const ms=d.movs;
+    d.tipo=d.doc?d.doc.split('-')[0]:'';
+    d.tipoNom=d.doc?(TIPOS_DOC[d.tipo]||d.tipo):ms.some(m=>m.motivo==='produccion')?'Fabricación':(MOTIVOS[ms[0].motivo]||ms[0].motivo||'Movimiento');
+    d.ref=(ms.find(m=>m.ref&&!/^En /.test(m.ref))||ms.find(m=>m.ref)||{}).ref||'';
+    d.anulado=ms.every(m=>m.anulado)?ms[0].anulado:'';
+    d.esAnulacion=ms.some(m=>m.motivo==='anulacion');
+    let vin=0,vout=0;
+    ms.forEach(m=>{const c=Number(m.costo_unitario)||0;if(m.delta>0)vin+=m.delta*c;else vout-=m.delta*c;});
+    d.valor=Math.max(vin,vout);
+    return d;
+  }).reverse();
+}
+
+let docAbierto=null;
+function renderDocumentos(){
+  const conNum=docsCache.filter(d=>d.doc);
+  document.getElementById('dc-total').textContent=conNum.length;
+  document.getElementById('dc-mes').textContent=conNum.filter(d=>getMesMov(d)).length;
+  document.getElementById('dc-anulados').textContent=docsCache.filter(d=>d.anulado).length;
+  const fSel=document.getElementById('dc-filtro');
+  const fv=fSel.value||'all';
+  const tipos=new Set(docsCache.map(d=>d.tipo||'—'));
+  fSel.innerHTML='<option value="all">Todos los tipos</option>'+
+    Object.keys(TIPOS_DOC).filter(t=>tipos.has(t)).map(t=>'<option value="'+t+'">'+t+' · '+TIPOS_DOC[t]+'</option>').join('')+
+    (tipos.has('—')?'<option value="—">Sin número (antes de los documentos)</option>':'');
+  fSel.value=[...fSel.options].some(o=>o.value===fv)?fv:'all';
+  const f=fSel.value;
+  const q=(document.getElementById('dc-search').value||'').toLowerCase();
+  const lista=docsCache.filter(d=>(f==='all'||(d.tipo||'—')===f)&&
+    (!q||(d.doc+' '+d.tipoNom+' '+d.ref+' '+d.usuario+' '+d.movs.map(m=>m.item_nombre+' '+m.series.join(' ')).join(' ')).toLowerCase().includes(q)));
+  const el=document.getElementById('dc-list');
+  if(!lista.length){el.innerHTML='<tr><td colspan="8" class="empty-cell">Sin documentos</td></tr>';return;}
+  el.innerHTML=lista.slice(0,300).map(d=>{
+    const puede=!d.anulado&&!d.esAnulacion;
+    let h='<tr'+(d.anulado?' class="anulado"':'')+'>'+
+      '<td data-label="Documento" class="cell-name mono" style="white-space:nowrap;">'+(d.doc?escHtml(d.doc):'<span style="color:var(--text-3);font-weight:500;">sin número</span>')+'</td>'+
+      '<td data-label="Fecha">'+escHtml(d.fecha||'—')+'</td>'+
+      '<td data-label="Tipo">'+escHtml(d.tipoNom)+(d.anulado?'<span class="tag bad">anulado · '+escHtml(d.anulado)+'</span>':'')+'</td>'+
+      '<td data-label="Referencia">'+escHtml(d.ref||'—')+'</td>'+
+      '<td data-label="Usuario">'+escHtml(d.usuario||'—')+'</td>'+
+      '<td data-label="Líneas" class="num">'+d.movs.length+'</td>'+
+      '<td data-label="Valor" class="num">'+fmtMoney(d.valor)+'</td>'+
+      '<td class="actions" data-label="">'+
+        '<button class="btn-sm" onclick="verDoc(\''+d.key+'\')">'+(docAbierto===d.key?'Ocultar':'Ver')+'</button>'+
+        (puede?'<button class="btn-sm" onclick="anularDoc(\''+d.key+'\')">Anular</button>':'')+
+      '</td></tr>';
+    if(docAbierto===d.key){
+      h+='<tr class="det"><td colspan="8"><div class="kx-scroll"><table class="kx-table narrow"><thead><tr><th class="l">Ítem</th><th class="l">Motivo</th><th class="l">Bodega</th><th>Cantidad</th><th>C. unit.</th><th>Total</th><th class="l">Series</th></tr></thead><tbody>'+
+        d.movs.map(m=>{
+          const c=costoValido(m.costo_unitario);
+          return '<tr><td class="l">'+escHtml(m.item_nombre)+'</td><td class="l">'+escHtml(MOTIVOS[m.motivo]||m.motivo||'—')+'</td><td class="l">'+escHtml(m.bodega||BOD_PRINCIPAL)+'</td>'+
+            '<td class="'+(m.delta<0?'out':'in')+'">'+(m.delta>0?'+':'')+m.delta+'</td>'+
+            '<td>'+(c?fmtCosto(m.costo_unitario):'—')+'</td><td>'+(c?fmtMoney(Math.abs(m.delta)*m.costo_unitario):'—')+'</td>'+
+            '<td class="l">'+escHtml(m.series.join(', '))+(/^En /.test(m.ref)?' <span style="color:var(--text-3);">'+escHtml(m.ref)+'</span>':'')+'</td></tr>';
+        }).join('')+'</tbody></table></div></td></tr>';
+    }
+    return h;
+  }).join('');
+}
+function verDoc(key){docAbierto=docAbierto===key?null:key;renderDocumentos();}
+
+// Anular revierte el stock en la misma bodega. No se puede si lo que entró ya salió, o si una serie
+// del documento se movió después.
+function errorAnulacion(d){
+  const efecto={};
+  d.movs.forEach(m=>{const k=m.tipo+'|'+m.item_id+'|'+(m.bodega||BOD_PRINCIPAL);efecto[k]=r4((efecto[k]||0)-m.delta);});
+  for(const [k,v] of Object.entries(efecto)){
+    const [tipo,id,b]=k.split('|');
+    const it=getItem(tipo,id);
+    if(!it)return 'Un ítem del documento ya no existe';
+    const hay=stockBod(tipo,id,b);
+    if(hay+v<-1e-9)return 'No se puede anular: de '+it.nombre+' quedan '+hay+' en '+b+' y hay que devolver '+(-v);
+  }
+  for(const m of d.movs){
+    for(const s of m.series){
+      const r=seriesCache[s];
+      if(r&&r.doc!==m.doc)return 'No se puede anular: la serie '+s+' se movió después ('+(r.doc||'otro movimiento')+')';
+    }
+  }
+  return '';
+}
+async function anularDoc(key){
+  const d=docsCache.find(x=>x.key===key);
+  if(!d||d.anulado||d.esAnulacion)return;
+  try{exigirServidorNuevo();}catch(e){toast(e.message,'error');return;}
+  const err=errorAnulacion(d);
+  if(err){toast(err,'error');return;}
+  const usuario=localStorage.getItem('inv_usuario')||'Danny';
+  if(!confirm('¿Anular '+(d.doc||'este movimiento sin número')+' ('+d.tipoNom+', '+d.movs.length+' línea(s))?\n\nSe registra un documento ANU a nombre de '+usuario+' que revierte el stock.'))return;
+  setSyncStatus('loading','Anulando…');
+  try{
+    const r=await jsonp(d.doc?{action:'anular',doc:d.doc,usuario}:{action:'anular',ids:JSON.stringify(d.movs.map(m=>m.id)),usuario});
+    aplicarRespuesta(r);
+    syncOk();
+    toast((d.doc||'Movimiento')+' anulado con '+r.doc+' ✓','success');
+  }catch(e){setSyncStatus('error','Error al anular');toast('No se anuló: '+e.message,'error');}
+}
+
+// ── Nuevo documento (varias líneas) ──
+const TIPOS_FORM={
+  compra:        {doc:'ING',dir:1, motivo:'compra',        label:'ING · Compra',costoObligatorio:true,hint:'Entra mercadería. El costo es obligatorio y va por unidad de medida (10 bombas por $60 → 6; rollo de 100 m por $28 → 0.28).'},
+  devolucion:    {doc:'DEV',dir:1, motivo:'devolucion',    label:'DEV · Devolución a bodega',hint:'Regresa algo que había salido. Sin costo, entra al costo promedio actual.'},
+  ajuste_mas:    {doc:'AJU',dir:1, motivo:'ajuste',        label:'AJU · Ajuste (suma)',hint:'Corrige el conteo físico hacia arriba. Sin costo, entra al costo promedio actual.'},
+  ajuste_menos:  {doc:'AJU',dir:-1,motivo:'ajuste',        label:'AJU · Ajuste (resta)',hint:'Corrige el conteo físico hacia abajo. Sale al costo promedio.'},
+  venta:         {doc:'VTA',dir:-1,motivo:'venta',         label:'VTA · Venta',hint:'Sale vendido. En Referencia pon el cliente y la factura.'},
+  uso_produccion:{doc:'EGR',dir:-1,motivo:'uso_produccion',label:'EGR · Uso en producción / instalación',hint:'Sale para armar, reparar o instalar. En Referencia pon el trabajo o el cliente.'},
+  dano:          {doc:'EGR',dir:-1,motivo:'dano',          label:'EGR · Daño / pérdida',hint:'Sale por daño o pérdida.'},
+  transferencia: {doc:'TRF',dir:0, motivo:'transferencia', label:'TRF · Transferencia entre bodegas',hint:'Mueve de una bodega a otra. El stock total y el costo no cambian.'},
+};
+let docDraft=[], docOcupado=false;
+const lineaDocVacia=()=>({key:'',qty:'',costo:'',ser:'',pick:[]});
+function abrirDoc(tipo){
+  try{exigirServidorNuevo();}catch(e){toast(e.message,'error');return;}
+  const sel=document.getElementById('doc-tipo');
+  sel.innerHTML=Object.entries(TIPOS_FORM).map(([k,T])=>'<option value="'+k+'">'+T.label+'</option>').join('');
+  sel.value=tipo||'compra';
+  document.getElementById('doc-bod').innerHTML=opcionesBodega(BOD_PRINCIPAL);
+  const otra=(bodegas.find(b=>b.codigo!==BOD_PRINCIPAL)||{}).codigo||BOD_PRINCIPAL;
+  document.getElementById('doc-dest').innerHTML=opcionesBodega(otra);
+  document.getElementById('doc-ref').value='';
+  const lastUser=localStorage.getItem('inv_usuario');
+  if(lastUser)document.getElementById('doc-usuario').value=lastUser;
+  docDraft=[lineaDocVacia()];
+  renderDoc();
+  document.getElementById('modal-doc').hidden=false;
+}
+function cerrarDoc(){if(docOcupado)return;document.getElementById('modal-doc').hidden=true;}
+function opcionesItems(sel){
+  const grupo=(titulo,lista,tipo)=>lista.length?'<optgroup label="'+titulo+'">'+[...lista].sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(i=>{
+    const v=tipo+':'+i.id;
+    return '<option value="'+v+'"'+(v===sel?' selected':'')+'>'+escHtml(i.nombre)+'</option>';
+  }).join('')+'</optgroup>':'';
+  return '<option value="">— Elegir —</option>'+grupo('Materiales',materiales,'material')+grupo('Máquinas',maquinas,'maquina');
+}
+function docCambio(){docDraft.forEach(l=>{l.pick=[];});renderDoc();}
+function renderDoc(){
+  const T=TIPOS_FORM[document.getElementById('doc-tipo').value];
+  const b=document.getElementById('doc-bod').value||BOD_PRINCIPAL;
+  document.getElementById('doc-dest-wrap').style.visibility=T.dir===0?'visible':'hidden';
+  document.getElementById('doc-bod-label').textContent=T.dir===0?'Bodega origen':'Bodega';
+  document.getElementById('doc-hint').textContent=T.hint;
+  document.getElementById('doc-costo-h').textContent=T.dir>0?'Costo unit.':'';
+  document.getElementById('doc-lines').innerHTML=docDraft.map((l,i)=>{
+    const [tipo,id]=l.key.split(':');
+    const it=l.key?getItem(tipo,id):null;
+    let ser='<span class="sub-line">No aplica</span>';
+    if(it&&it.serie){
+      if(T.dir>0)ser='<textarea rows="1" placeholder="Una por línea" oninput="docSet('+i+',\'ser\',this.value)">'+escHtml(l.ser)+'</textarea>';
+      else{
+        const disp=seriesEn(tipo,id,b);
+        ser=disp.length?'<div class="picks">'+disp.map(s=>'<label><input type="checkbox" value="'+escHtml(s)+'"'+(l.pick.includes(s)?' checked':'')+' onchange="docPick('+i+',this)">'+escHtml(s)+'</label>').join('')+'</div>'
+          :'<span class="picks-empty">No hay series en '+escHtml(b)+'</span>';
+      }
+    }
+    const prom=it?getKardex(tipo,id).prom:0;
+    return '<tr>'+
+      '<td><select onchange="docSet('+i+',\'key\',this.value,true)">'+opcionesItems(l.key)+'</select></td>'+
+      '<td class="disp">'+(it?stockBod(tipo,id,b)+' '+escHtml(it.unidad||'unidad'):'')+'</td>'+
+      '<td><input type="number" min="0" step="any" inputmode="decimal" id="doc-qty-'+i+'" value="'+escHtml(l.qty)+'" oninput="docSet('+i+',\'qty\',this.value)"/></td>'+
+      '<td>'+(T.dir>0?'<input type="number" min="0" step="0.0001" inputmode="decimal" value="'+escHtml(l.costo)+'" placeholder="'+(prom?r4(prom):'0.00')+'" oninput="docSet('+i+',\'costo\',this.value)"/>':'')+'</td>'+
+      '<td>'+ser+'</td>'+
+      '<td><button class="icon-btn del" title="Quitar línea" onclick="quitarLineaDoc('+i+')">'+ICON_TRASH+'</button></td>'+
+    '</tr>';
+  }).join('');
+  renderDocTotal();
+}
+function docSet(i,campo,valor,rerender){
+  docDraft[i][campo]=valor;
+  if(campo==='key'){docDraft[i].pick=[];docDraft[i].ser='';}
+  if(rerender)renderDoc();else renderDocTotal();
+}
+// Marcar series de salida ajusta la cantidad
+function docPick(i,cb){
+  const l=docDraft[i];
+  l.pick=cb.checked?[...l.pick,cb.value]:l.pick.filter(s=>s!==cb.value);
+  l.qty=String(l.pick.length);
+  const q=document.getElementById('doc-qty-'+i);if(q)q.value=l.qty;
+  renderDocTotal();
+}
+function agregarLineaDoc(){docDraft.push(lineaDocVacia());renderDoc();}
+function quitarLineaDoc(i){docDraft.splice(i,1);if(!docDraft.length)docDraft.push(lineaDocVacia());renderDoc();}
+function renderDocTotal(){
+  const T=TIPOS_FORM[document.getElementById('doc-tipo').value];
+  const total=docDraft.reduce((s,l)=>{
+    if(!l.key)return s;
+    const [tipo,id]=l.key.split(':');
+    const c=T.dir>0&&costoValido(l.costo)?Number(l.costo):getKardex(tipo,id).prom;
+    return s+(Number(l.qty)||0)*c;
+  },0);
+  document.getElementById('doc-total').textContent=fmtMoney(total);
+}
+async function guardarDoc(){
+  if(docOcupado)return;
+  const T=TIPOS_FORM[document.getElementById('doc-tipo').value];
+  const b=document.getElementById('doc-bod').value||BOD_PRINCIPAL;
+  const dest=document.getElementById('doc-dest').value;
+  const usuario=document.getElementById('doc-usuario').value;
+  const ref=document.getElementById('doc-ref').value.trim();
+  if(T.dir===0&&b===dest){toast('La bodega de origen y la de destino son la misma','error');return;}
+  const lineas=[],salen={},usadas=new Set();
+  for(const [i,l] of docDraft.entries()){
+    if(!l.key&&!l.qty)continue;
+    const pre='Línea '+(i+1)+': ';
+    if(!l.key){toast(pre+'elige el ítem','error');return;}
+    const [tipo,id]=l.key.split(':');
+    const it=getItem(tipo,id);
+    if(!it){toast(pre+'el ítem ya no existe','error');return;}
+    const qty=Number(l.qty);
+    if(!(qty>0)){toast(pre+'cantidad inválida','error');return;}
+    let series=[];
+    if(T.dir>0){
+      if(T.costoObligatorio&&!costoValido(l.costo)){toast(pre+'pon el costo unitario de la compra','error');return;}
+      if(l.costo!==''&&!costoValido(l.costo)){toast(pre+'costo inválido','error');return;}
+      if(it.serie){series=parseSeries(l.ser);const e=errorSeriesEntrada(it,qty,series);if(e){toast(e,'error');return;}}
+    }else{
+      salen[l.key]=r4((salen[l.key]||0)+qty);
+      const hay=stockBod(tipo,id,b);
+      if(salen[l.key]>hay+1e-9){toast(pre+'de '+it.nombre+' solo hay '+hay+' en '+b,'error');return;}
+      if(it.serie){
+        const disp=seriesEn(tipo,id,b);
+        series=l.pick.filter(s=>disp.includes(s));
+        if(series.length!==qty){toast(pre+'marca '+qty+' serie(s) de '+it.nombre,'error');return;}
+      }
+    }
+    const rep=series.find(s=>usadas.has(s));
+    if(rep){toast('La serie '+rep+' está en dos líneas','error');return;}
+    series.forEach(s=>usadas.add(s));
+    const prom=r4(getKardex(tipo,id).prom);
+    if(T.dir===0){
+      lineas.push({tipo,item_id:id,delta:-qty,motivo:T.motivo,costo:prom,bodega:b,series});
+      lineas.push({tipo,item_id:id,delta:qty,motivo:T.motivo,costo:prom,bodega:dest,series});
+    }else{
+      // Entrada sin costo: materiales al promedio actual; máquinas vacío, para valorarlas por su receta
+      const costo=T.dir<0?prom:costoValido(l.costo)?Number(l.costo):tipo==='maquina'?'':prom;
+      lineas.push({tipo,item_id:id,delta:T.dir*qty,motivo:T.motivo,costo,bodega:b,series});
+    }
+  }
+  if(!lineas.length){toast('Agrega al menos una línea con ítem y cantidad','error');return;}
+  docOcupado=true;
+  const btn=document.getElementById('btn-doc');btn.disabled=true;btn.textContent='Guardando…';
+  setSyncStatus('loading','Guardando documento…');
+  try{
+    localStorage.setItem('inv_usuario',usuario);
+    const num=await enviarDoc(T.doc,lineas,ref,usuario);
+    syncOk();
+    docOcupado=false;cerrarDoc();
+    toast('Documento '+num+' guardado ✓','success');
+  }catch(e){setSyncStatus('error','Error al guardar');toast('No se guardó: '+e.message,'error');}
+  finally{docOcupado=false;btn.disabled=false;btn.textContent='Guardar documento';}
+}
+
+// ── Bodegas ──
+function renderBodegas(){
+  document.getElementById('bd-total').textContent=bodegas.length;
+  const todos=[...maquinas.map(i=>({...i,tipo:'maquina'})),...materiales.map(i=>({...i,tipo:'material'}))];
+  const fuera=todos.filter(i=>bodegas.some(b=>b.codigo!==BOD_PRINCIPAL&&stockBod(i.tipo,i.id,b.codigo)));
+  document.getElementById('bd-fuera').textContent=fuera.length;
+  const q=(document.getElementById('bd-search').value||'').toLowerCase();
+  const f=document.getElementById('bd-filtro').value;
+  const lista=todos.filter(i=>(f==='all'||i.tipo===f)&&(!q||i.nombre.toLowerCase().includes(q))&&
+    (i.stock||bodegas.some(b=>stockBod(i.tipo,i.id,b.codigo)))).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  document.getElementById('bd-head').innerHTML='<tr><th>Ítem</th><th>Tipo</th>'+bodegas.map(b=>'<th class="num" title="'+escHtml(b.nombre)+'">'+escHtml(b.codigo)+'</th>').join('')+'<th class="num">Total</th></tr>';
+  document.getElementById('bd-list').innerHTML=lista.length?lista.map(i=>
+    '<tr><td data-label="Ítem" class="cell-name">'+escHtml(i.nombre)+(i.serie?'<span class="tag acc">serie</span>':'')+'</td>'+
+    '<td data-label="Tipo">'+(i.tipo==='maquina'?'Máquina':'Material')+'</td>'+
+    bodegas.map(b=>{const v=stockBod(i.tipo,i.id,b.codigo);return '<td data-label="'+escHtml(b.codigo)+'" class="num"'+(v?(v<0?' style="color:var(--bad);"':''):' style="color:var(--text-3);"')+'>'+(v||'·')+'</td>';}).join('')+
+    '<td data-label="Total" class="num">'+i.stock+' <span style="color:var(--text-3);font-weight:400;">'+escHtml(i.unidad||'unidad')+'</span></td></tr>').join('')
+    :'<tr><td colspan="'+(bodegas.length+3)+'" class="empty-cell">Sin ítems con stock</td></tr>';
+  document.getElementById('bd-cods').innerHTML=bodegas.map(b=>{
+    const n=todos.filter(i=>stockBod(i.tipo,i.id,b.codigo)).length;
+    const usada=b.codigo===BOD_PRINCIPAL||movimientos.some(m=>m.bodega===b.codigo);
+    return '<tr><td data-label="Código" class="cell-name mono">'+escHtml(b.codigo)+'</td><td data-label="Nombre">'+escHtml(b.nombre)+'</td>'+
+      '<td data-label="Ítems con stock" class="num">'+n+'</td><td class="actions" data-label="">'+
+      '<button class="btn-sm" onclick="renombrarBodega(\''+b.codigo+'\')">Renombrar</button>'+
+      (usada?'':'<button class="icon-btn del" title="Borrar bodega" onclick="borrarBodega(\''+b.codigo+'\')">'+ICON_TRASH+'</button>')+'</td></tr>';
+  }).join('');
+}
+async function guardarBodega(codigo,nombre){
+  const nueva=codigo===undefined;
+  if(nueva){codigo=document.getElementById('bd-cod').value.trim().toUpperCase();nombre=document.getElementById('bd-nom').value.trim();}
+  if(!/^[A-Z0-9_-]{1,8}$/.test(codigo)){toast('Código: hasta 8 letras o números, sin espacios','error');return;}
+  if(!nombre){toast('Pon el nombre de la bodega','error');return;}
+  if(nueva&&bodegas.some(b=>b.codigo===codigo)){toast('Ya existe la bodega '+codigo,'error');return;}
+  try{
+    exigirServidorNuevo();
+    const d=await jsonp({action:'save_bodega',codigo,nombre});
+    bodegas=normBodegas(d.bodegas);guardarLocal();render();
+    if(nueva){document.getElementById('bd-cod').value='';document.getElementById('bd-nom').value='';}
+    toast('Bodega '+codigo+' guardada ✓','success');
+  }catch(e){toast('No se guardó: '+e.message,'error');}
+}
+function renombrarBodega(c){
+  const b=bodegas.find(x=>x.codigo===c);if(!b)return;
+  const n=prompt('Nombre de la bodega '+c+':',b.nombre);
+  if(n&&n.trim())guardarBodega(c,n.trim());
+}
+async function borrarBodega(c){
+  if(!confirm('¿Borrar la bodega '+c+'?'))return;
+  try{
+    exigirServidorNuevo();
+    const d=await jsonp({action:'delete_bodega',codigo:c});
+    bodegas=normBodegas(d.bodegas);guardarLocal();render();
+    toast('Bodega borrada','success');
+  }catch(e){toast('No se borró: '+e.message,'error');}
+}
+
+// ── Series ──
+let srLista=[];
+function renderSeries(){
+  const todas=Object.values(seriesCache);
+  const cuenta=e=>todas.filter(r=>r.estado===e).length;
+  document.getElementById('sr-total').textContent=todas.length;
+  document.getElementById('sr-bodega').textContent=cuenta('En bodega');
+  document.getElementById('sr-vendidas').textContent=cuenta('Vendida');
+  document.getElementById('sr-instaladas').textContent=cuenta('Instalada');
+  const q=(document.getElementById('sr-search').value||'').toLowerCase();
+  const est=document.getElementById('sr-estado').value;
+  srLista=todas.filter(r=>(!est||r.estado===est)&&(!q||(r.serie+' '+r.item_nombre).toLowerCase().includes(q)))
+    .sort((a,b)=>a.item_nombre.localeCompare(b.item_nombre)||a.serie.localeCompare(b.serie));
+  const cls={'En bodega':'ok','Vendida':'acc','Instalada':'acc','Dada de baja':'bad'};
+  document.getElementById('sr-list').innerHTML=srLista.length?srLista.map((r,i)=>{
+    const it=getItem(r.tipo,r.item_id);
+    return '<tr><td data-label="Serie" class="cell-name mono">'+escHtml(r.serie)+'</td>'+
+      '<td data-label="Ítem">'+escHtml(it?it.nombre:r.item_nombre)+'</td>'+
+      '<td data-label="Estado"><span class="tag '+(cls[r.estado]||'')+'" style="margin-left:0;">'+escHtml(r.estado)+'</span></td>'+
+      '<td data-label="Dónde / detalle">'+escHtml(r.bod?r.bod+' · '+nombreBodega(r.bod):r.det||'—')+'</td>'+
+      '<td data-label="Último documento" class="mono">'+escHtml(r.doc||'—')+' <span style="color:var(--text-3);">'+escHtml(r.fecha||'')+'</span></td>'+
+      '<td class="actions" data-label=""><button class="btn-sm" onclick="verSerie('+i+')">Historia</button></td></tr>';
+  }).join(''):'<tr><td colspan="6" class="empty-cell">'+(todas.length?'Sin resultados':'Todavía no hay series. Usa “Controlar por serie” para empezar.')+'</td></tr>';
+}
+function verSerie(i){
+  const r=srLista[i];if(!r)return;
+  const it=getItem(r.tipo,r.item_id);
+  document.getElementById('sr-title').textContent='Serie '+r.serie;
+  document.getElementById('sr-sub').textContent=(it?it.nombre:r.item_nombre)+' · '+r.estado+(r.bod?' en '+r.bod+' · '+nombreBodega(r.bod):r.det?' · '+r.det:'');
+  document.getElementById('sr-hist').innerHTML=r.hist.map(h=>'<tr><td class="l">'+escHtml(h.fecha||'—')+'</td><td class="l">'+escHtml(h.doc||'—')+'</td>'+
+    '<td class="l '+(h.delta>0?'in':h.delta<0?'out':'')+'">'+(h.delta>0?'Entra':h.delta<0?'Sale':'Registro')+' · '+escHtml(MOTIVOS[h.motivo]||h.motivo)+'</td>'+
+    '<td class="l">'+escHtml(h.bod)+'</td><td class="l">'+escHtml(h.ref||'')+'</td><td class="l">'+escHtml(h.usuario||'')+'</td></tr>').join('');
+  // Componentes con serie instalados en esta máquina
+  const dentro=Object.values(seriesCache).filter(x=>x.estado==='Instalada'&&/^En /.test(x.det)&&x.det.slice(3).split(', ').includes(r.serie));
+  document.getElementById('sr-dentro').innerHTML=dentro.length?'<div class="kx-info" style="margin-top:12px;"><b>Componentes con serie dentro:</b> '+
+    dentro.map(x=>escHtml(x.serie)+' ('+escHtml(x.item_nombre)+')').join(', ')+'</div>':'';
+  document.getElementById('modal-sr').hidden=false;
+}
+
+// Activar el control por serie: si el ítem ya tiene stock, se registran las series de las unidades que hay
+// en cada bodega (documento SER, no cambia el stock). Sirve también para completar series que falten.
+let actOcupado=false;
+function itemsSinSeries(){
+  return [...materiales.map(i=>({i,t:'material'})),...maquinas.map(i=>({i,t:'maquina'}))]
+    .filter(({i,t})=>!i.serie||bodegas.some(b=>stockBod(t,i.id,b.codigo)>seriesEn(t,i.id,b.codigo).length));
+}
+function abrirActivarSerie(){
+  try{exigirServidorNuevo();}catch(e){toast(e.message,'error');return;}
+  const lista=itemsSinSeries();
+  if(!lista.length){toast('Todos los ítems ya se controlan por serie','error');return;}
+  const grupo=(titulo,t)=>{const g=lista.filter(x=>x.t===t).sort((a,b)=>a.i.nombre.localeCompare(b.i.nombre));
+    return g.length?'<optgroup label="'+titulo+'">'+g.map(({i})=>'<option value="'+t+':'+i.id+'">'+escHtml(i.nombre)+(i.serie?' (faltan series)':'')+'</option>').join('')+'</optgroup>':'';};
+  document.getElementById('act-item').innerHTML=grupo('Materiales','material')+grupo('Máquinas','maquina');
+  const lastUser=localStorage.getItem('inv_usuario');
+  if(lastUser)document.getElementById('act-usuario').value=lastUser;
+  renderActivarSerie();
+  document.getElementById('modal-act').hidden=false;
+}
+function faltanSeries(t,id){
+  return bodegas.map(b=>({b,n:r4(stockBod(t,id,b.codigo)-seriesEn(t,id,b.codigo).length)})).filter(x=>x.n>0);
+}
+function renderActivarSerie(){
+  const v=document.getElementById('act-item').value;
+  const i=v.indexOf(':'),t=v.slice(0,i),id=v.slice(i+1);
+  const it=getItem(t,id);
+  const el=document.getElementById('act-bods');
+  if(!it){el.innerHTML='';return;}
+  const falta=faltanSeries(t,id);
+  if(!falta.length){el.innerHTML='<div class="kx-info">No tiene stock sin serie: solo se activa el control.</div>';return;}
+  if(falta.some(x=>!Number.isInteger(x.n))){el.innerHTML='<div class="kx-warn bad">El stock no es entero: este ítem no se puede controlar por serie.</div>';return;}
+  el.innerHTML=falta.map(({b,n})=>'<div class="field"><label>Series en '+escHtml(b.codigo)+' · '+escHtml(b.nombre)+' ('+n+' unidad(es), una por línea)</label>'+
+    '<textarea id="act-ser-'+escHtml(b.codigo)+'" rows="'+Math.min(6,Math.max(2,n))+'"></textarea></div>').join('');
+}
+async function confirmarActivarSerie(){
+  if(actOcupado)return;
+  const v=document.getElementById('act-item').value;
+  const i=v.indexOf(':'),t=v.slice(0,i),id=v.slice(i+1);
+  const it=getItem(t,id);if(!it)return;
+  const usuario=document.getElementById('act-usuario').value;
+  const falta=faltanSeries(t,id);
+  if(falta.some(x=>!Number.isInteger(x.n))){toast('El stock no es entero','error');return;}
+  const lineas=[],todas=[];
+  for(const {b,n} of falta){
+    const series=parseSeries(document.getElementById('act-ser-'+b.codigo).value);
+    const e=errorSeriesEntrada(it,n,series);
+    if(e){toast(b.codigo+': '+e,'error');return;}
+    todas.push(...series);
+    lineas.push({tipo:t,item_id:id,delta:0,motivo:'registro_series',bodega:b.codigo,series});
+  }
+  if(new Set(todas).size!==todas.length){toast('Hay series repetidas entre bodegas','error');return;}
+  actOcupado=true;
+  const btn=document.getElementById('btn-act');btn.disabled=true;btn.textContent='Guardando…';
+  try{
+    localStorage.setItem('inv_usuario',usuario);
+    let num='';
+    if(lineas.length)num=await enviarDoc('SER',lineas,'Inicio del control por serie',usuario);
+    if(!it.serie){
+      await jsonp({action:'set_serie',tipo:t,id,serie:'1'});
+      it.serie=true;guardarLocal();render();
+    }
+    document.getElementById('modal-act').hidden=true;
+    toast(it.nombre+': control por serie activo'+(num?' · '+num:'')+' ✓','success');
+  }catch(e){toast('No se guardó: '+e.message,'error');}
+  finally{actOcupado=false;btn.disabled=false;btn.textContent='Activar control por serie';}
+}
+
 // ── RENDER ────────────────────────────────────────────────
 function render(){
   kardexCache=calcKardexAll();
+  bodCache=calcBodegas();seriesCache=calcSeries();docsCache=agruparDocs();
+  document.getElementById('banner-srv').hidden=servidorNuevo!==false;
   renderMaquinas();renderMateriales();renderMovimientos();renderAlertas();renderProduccion();
+  renderDocumentos();renderBodegas();renderSeries();
   if(fabData&&!fabOcupado)renderFabricar();
   if(kardexAbierto)abrirKardex(kardexAbierto.id,kardexAbierto.tipo);
 }
@@ -1355,7 +2290,7 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
     const statusClass=isAgotado?'is-agotado':isBajo?'is-bajo':'ok';
     const statusTxt=isAgotado?'Agotado':isBajo?'Bajo':'OK';
     return '<tr>'+
-      '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
+      '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.serie?'<span class="tag acc">serie</span>':'')+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
       '<td data-label="Categoría">'+escHtml(c.label)+'</td>'+
       '<td data-label="Stock" class="num">'+item.stock+'</td>'+
       '<td data-label="Mín." class="num">'+item.stock_minimo+'</td>'+
@@ -1397,17 +2332,19 @@ function renderMovimientos(){
 
   const el=document.getElementById('mv-list');
   if(!filtered.length){
-    el.innerHTML='<tr><td colspan="6" class="empty-cell">Sin movimientos</td></tr>';
+    el.innerHTML='<tr><td colspan="8" class="empty-cell">Sin movimientos</td></tr>';
     return;
   }
   const sorted=[...filtered].reverse();
   el.innerHTML=sorted.map(m=>{
     const esEntrada=m.delta>0;
-    return '<tr>'+
+    return '<tr'+(movActivo(m)?'':' class="anulado"')+'>'+
       '<td data-label="Fecha">'+escHtml(m.fecha||'—')+'</td>'+
-      '<td data-label="Ítem" class="cell-name">'+escHtml(m.item_nombre)+'</td>'+
+      '<td data-label="Documento" class="mono" style="white-space:nowrap;">'+escHtml(m.doc||'—')+(m.anulado?'<span class="tag bad">anulado</span>':'')+'</td>'+
+      '<td data-label="Ítem" class="cell-name">'+escHtml(m.item_nombre)+(m.series.length?'<span class="cell-note">'+escHtml(m.series.join(', '))+'</span>':'')+'</td>'+
       '<td data-label="Tipo">'+(m.tipo==='maquina'?'Máquina':'Material')+'</td>'+
-      '<td data-label="Motivo">'+escHtml(m.motivo||'—')+'</td>'+
+      '<td data-label="Motivo">'+escHtml(MOTIVOS[m.motivo]||m.motivo||'—')+'</td>'+
+      '<td data-label="Bodega">'+escHtml(m.bodega||BOD_PRINCIPAL)+'</td>'+
       '<td data-label="Usuario">'+escHtml(m.usuario||'—')+'</td>'+
       '<td data-label="Cantidad" class="num" style="color:'+(esEntrada?'var(--ok)':'var(--bad)')+';">'+(esEntrada?'+':'')+m.delta+'</td>'+
     '</tr>';
@@ -1503,26 +2440,37 @@ async function addItem(tipo){
   const costoTxt=tipo==='maquina'?'':document.getElementById(p+'-costo').value.trim();
   const precioTxt=tipo==='maquina'?document.getElementById('mq-precio').value.trim():'';
   const usuario=document.getElementById(p+'-usuario').value;
+  const serie=document.getElementById(p+'-serie').checked;
+  const series=serie?parseSeries(document.getElementById(p+'-series').value):[];
   if(!nombre){document.getElementById(p+'-nombre').classList.add('error');toast('Ingresa un nombre','error');return;}
   document.getElementById(p+'-nombre').classList.remove('error');
   if(costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
   if(precioTxt&&!costoValido(precioTxt)){toast('Precio de venta inválido','error');return;}
+  if(serie&&stock>0){const e=errorSeriesEntrada({nombre},stock,series);if(e){toast(e,'error');return;}}
+  try{exigirServidorNuevo();}catch(e){toast(e.message,'error');return;}
   const btnId='btn-'+p;
   const btn=document.getElementById(btnId);
   btn.disabled=true;btn.textContent='Guardando…';
-  const item={id:Date.now().toString(),nombre,categoria:cat,stock,stock_minimo:min,unidad,nota,precio_venta:precioTxt?Number(precioTxt):''};
+  // El ítem se crea con stock 0 y el stock inicial entra como documento INI (con bodega y series)
+  const item={id:Date.now().toString(),nombre,categoria:cat,stock:0,stock_minimo:min,unidad,nota,precio_venta:precioTxt?Number(precioTxt):'',serie};
   try{
-    await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:item.stock,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota,precio_venta:item.precio_venta});
+    await jsonpAction({action:'add_item',tipo,id:item.id,nombre:item.nombre,categoria:item.categoria,stock:0,stock_minimo:item.stock_minimo,unidad:item.unidad,nota:item.nota,precio_venta:item.precio_venta,serie:serie?'1':''});
     localStorage.setItem('inv_usuario',usuario);
-    if(stock>0){
-      const mv={id:(Date.now()+1).toString(),tipo,item_id:item.id,item_nombre:item.nombre,delta:stock,motivo:'Stock inicial',usuario,costo_unitario:costoTxt?Number(costoTxt):''};
-      await jsonpAction({action:'add_movimiento',...mv});
-      movimientos.push({...mv,fecha:fechaHoy()});
-    }
     if(tipo==='maquina')maquinas.push(item); else materiales.push(item);
-    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
-    localStorage.setItem('inv_mt',JSON.stringify(materiales));
+    guardarLocal();
     render();
+    if(stock>0){
+      try{
+        await enviarDoc('INI',[{tipo,item_id:item.id,delta:stock,motivo:'stock_inicial',costo:costoTxt?Number(costoTxt):'',bodega:BOD_PRINCIPAL,series}],'Stock inicial',usuario);
+      }catch(e){
+        toast(nombre+' se creó, pero sin stock ('+e.message+'). Registra una entrada.','error');
+        toggleDrawer(tipo,true);
+        return;
+      }
+    }
+    document.getElementById(p+'-serie').checked=false;
+    document.getElementById(p+'-series').value='';
+    document.getElementById(p+'-series-wrap').hidden=true;
     document.getElementById(p+'-nombre').value='';
     document.getElementById(p+'-stock-ini').value='';
     document.getElementById(p+'-nota').value='';
@@ -1565,46 +2513,76 @@ function abrirModal(itemId,tipo,direccion){
     :'Sale al costo promedio actual: '+fmtCosto(prom)+' por unidad.';
   const lastUser=localStorage.getItem('inv_usuario');
   if(lastUser)document.getElementById('modal-usuario').value=lastUser;
+  document.getElementById('modal-bod').innerHTML=opcionesBodega(BOD_PRINCIPAL);
+  document.getElementById('modal-ref').value='';
+  document.getElementById('modal-ser').value='';
+  renderModalSeries();
   document.getElementById('modal').style.display='flex';
   setTimeout(()=>document.getElementById('modal-qty').focus(),100);
 }
 
 function cerrarModal(){document.getElementById('modal').style.display='none';modalData=null;}
 
+// Stock de la bodega elegida y, si el ítem se controla por serie, las series que entran o salen
+function renderModalSeries(){
+  if(!modalData)return;
+  const it=getItem(modalData.tipo,modalData.itemId);if(!it)return;
+  const b=document.getElementById('modal-bod').value||BOD_PRINCIPAL;
+  const ent=modalData.direccion==='entrada';
+  const u=it.unidad||'unidad';
+  document.getElementById('modal-item-name').textContent=it.nombre+' · stock: '+it.stock+' '+u+(bodegas.length>1?' · en '+b+': '+stockBod(modalData.tipo,it.id,b):'');
+  document.getElementById('modal-ser-wrap').hidden=!it.serie;
+  if(!it.serie)return;
+  document.getElementById('modal-ser').hidden=!ent;
+  document.getElementById('modal-ser-label').textContent=ent?'Series (una por línea, una por unidad)':'Marca las series que salen';
+  const disp=ent?[]:seriesEn(modalData.tipo,it.id,b);
+  document.getElementById('modal-picks').innerHTML=ent?'':disp.length
+    ?disp.map(s=>'<label><input type="checkbox" value="'+escHtml(s)+'" onchange="modalPick()">'+escHtml(s)+'</label>').join('')
+    :'<span class="picks-empty">No hay series en '+escHtml(b)+'</span>';
+}
+function modalPick(){
+  const n=document.querySelectorAll('#modal-picks input:checked').length;
+  document.getElementById('modal-qty').value=n||'';
+}
+
 async function confirmarStock(){
   if(!modalData)return;
   const qty=parseFloat(document.getElementById('modal-qty').value);
   const motivo=document.getElementById('modal-motivo').value;
   const usuario=document.getElementById('modal-usuario').value;
+  const bod=document.getElementById('modal-bod').value||BOD_PRINCIPAL;
+  const ref=document.getElementById('modal-ref').value.trim();
   if(!qty||qty<=0){toast('Ingresa una cantidad válida','error');return;}
   const esEntrada=modalData.direccion==='entrada';
-  const itemSel=(modalData.tipo==='maquina'?maquinas:materiales).find(i=>i.id===modalData.itemId);
-  if(!esEntrada&&itemSel&&qty>itemSel.stock+1e-9){toast('Solo hay '+itemSel.stock+' '+(itemSel.unidad||'unidad')+' en stock','error');return;}
+  const {tipo,itemId}=modalData;
+  const item=getItem(tipo,itemId);
+  if(!item)return;
+  const enBod=stockBod(tipo,itemId,bod);
+  if(!esEntrada&&qty>enBod+1e-9){toast('Solo hay '+enBod+' '+(item.unidad||'unidad')+' en '+bod,'error');return;}
   const costoTxt=document.getElementById('modal-costo').value.trim();
   if(esEntrada&&motivo==='compra'&&!costoTxt){toast('Ingresa el costo unitario de la compra','error');return;}
   if(esEntrada&&costoTxt&&!costoValido(costoTxt)){toast('Costo unitario inválido','error');return;}
-  const prom=getKardex(modalData.tipo,modalData.itemId).prom;
-  const costo_unitario=esEntrada&&costoTxt?Number(costoTxt):Math.round(prom*10000)/10000;
+  let series=[];
+  if(item.serie){
+    if(esEntrada){
+      series=parseSeries(document.getElementById('modal-ser').value);
+      const e=errorSeriesEntrada(item,qty,series);if(e){toast(e,'error');return;}
+    }else{
+      series=[...document.querySelectorAll('#modal-picks input:checked')].map(x=>x.value);
+      if(series.length!==qty){toast('Marca '+qty+' serie(s) de las que salen','error');return;}
+    }
+  }
+  const prom=r4(getKardex(tipo,itemId).prom);
+  // Entrada sin costo: materiales al promedio actual; máquinas vacío, para valorarlas por su receta
+  const costo=esEntrada?(costoTxt?Number(costoTxt):tipo==='maquina'?'':prom):prom;
   localStorage.setItem('inv_usuario',usuario);
   const delta=esEntrada?qty:-qty;
   const btn=document.getElementById('modal-confirm');
   btn.disabled=true;btn.textContent='Guardando…';
   try{
-    await jsonpAction({action:'update_stock',tipo:modalData.tipo,id:modalData.itemId,delta});
-    const lista=modalData.tipo==='maquina'?maquinas:materiales;
-    const item=lista.find(i=>i.id===modalData.itemId);
-    if(item){
-      item.stock=r4(item.stock+delta);
-      const mv={id:Date.now().toString(),tipo:modalData.tipo,item_id:modalData.itemId,item_nombre:item?.nombre||'',delta,motivo,usuario,costo_unitario};
-      await jsonpAction({action:'add_movimiento',...mv});
-      movimientos.push({...mv,fecha:fechaHoy()});
-    }
-    localStorage.setItem('inv_mq',JSON.stringify(maquinas));
-    localStorage.setItem('inv_mt',JSON.stringify(materiales));
-    localStorage.setItem('inv_mv',JSON.stringify(movimientos));
+    const num=await enviarDoc(DOC_DE_MOTIVO[motivo]||'AJU',[{tipo,item_id:itemId,delta,motivo,costo,bodega:bod,series}],ref,usuario);
     cerrarModal();
-    render();
-    toast('Stock actualizado ✓','success');
+    toast('Stock actualizado · '+num+' ✓','success');
   }catch(e){toast('Error al actualizar: '+e.message,'error');}
   finally{btn.disabled=false;btn.textContent='Confirmar';}
 }
@@ -1635,7 +2613,7 @@ function setFiltroMov(f){
 }
 
 function switchTab(tab){
-  ['maquinas','materiales','produccion','movimientos','alertas'].forEach(t=>{
+  ['maquinas','materiales','produccion','documentos','movimientos','bodegas','series','alertas'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('stats-'+t).classList.toggle('active',t===tab);
@@ -1695,17 +2673,38 @@ function exportarExcel(tipo){
     XLSX.writeFile(wb,'AUTOBOX_Stock_Critico_'+fecha.replace(/\//g,'-')+'.xlsx');
   } else {
     if(!movimientos.length){toast('No hay movimientos','error');return;}
-    const det=[['MOVIMIENTOS AUTOBOX'],[],['Fecha','Tipo','Ítem','Delta','Motivo','Usuario']];
+    const det=[['MOVIMIENTOS AUTOBOX'],[],['Fecha','Documento','Tipo','Ítem','Delta','Motivo','Bodega','Costo unit.','Series','Referencia','Anulado por','Usuario']];
     [...movimientos].reverse().forEach(m=>{
-      det.push([m.fecha||'',m.tipo==='maquina'?'Máquina':'Material',m.item_nombre,m.delta,m.motivo||'',m.usuario||'']);
+      det.push([m.fecha||'',m.doc||'',m.tipo==='maquina'?'Máquina':'Material',m.item_nombre,m.delta,MOTIVOS[m.motivo]||m.motivo||'',m.bodega||BOD_PRINCIPAL,
+        costoValido(m.costo_unitario)?Number(m.costo_unitario):'',m.series.join(', '),m.ref||'',m.anulado||'',m.usuario||'']);
     });
     const ws=XLSX.utils.aoa_to_sheet(det);
-    ws['!cols']=[{wch:14},{wch:12},{wch:32},{wch:8},{wch:20},{wch:12}];
+    ws['!cols']=[{wch:12},{wch:12},{wch:10},{wch:32},{wch:8},{wch:18},{wch:8},{wch:10},{wch:24},{wch:28},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb,ws,'Movimientos');
     XLSX.writeFile(wb,'AUTOBOX_Movimientos_'+fecha.replace(/\//g,'-')+'.xlsx');
   }
   toast('Excel descargado ✓','success');
 }
+
+// ── TECLAS ───────────────────────────────────────────────
+// F9 busca en la pestaña, F10 guarda la ventana abierta (o abre "Nuevo…"), Esc cierra la ventana
+function ventanaAbierta(){return [...document.querySelectorAll('.modal-overlay')].find(m=>getComputedStyle(m).display!=='none');}
+document.addEventListener('keydown',e=>{
+  const v=ventanaAbierta();
+  if(e.key==='F9'){
+    e.preventDefault();
+    if(v)return;
+    const i=document.querySelector('.tab-panel.active .search-wrap input');
+    if(i){i.focus();i.select();}
+  }else if(e.key==='F10'){
+    e.preventDefault();
+    const b=v?v.querySelector('.btn-primary,.modal-btn.confirm'):document.querySelector('.tab-panel.active .btn-new');
+    if(b&&!b.disabled)b.click();
+  }else if(e.key==='Escape'){
+    if(v){const c=v.querySelector('.modal-close,.modal-btn.cancel');if(c)c.click();}
+    else if(e.target.matches('.search-wrap input')){e.target.value='';e.target.dispatchEvent(new Event('input'));}
+  }
+});
 
 // ── INIT ─────────────────────────────────────────────────
 const lastUser=localStorage.getItem('inv_usuario');
