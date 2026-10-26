@@ -3,31 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#1f323b">
+<meta name="theme-color" content="#1d3a52">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect x=%274%27 y=%274%27 width=%2740%27 height=%2740%27 rx=%2710%27 fill=%27%231d3a52%27/%3E%3Crect x=%2712%27 y=%2712%27 width=%2724%27 height=%2724%27 rx=%276%27 fill=%27none%27 stroke=%27%235a9bd5%27 stroke-width=%273.5%27/%3E%3Crect x=%2726%27 y=%2716%27 width=%276%27 height=%279%27 rx=%272%27 fill=%27%235a9bd5%27/%3E%3C/svg%3E">
 <title>AUTOBOX · Inventario</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Poppins:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --head:#1f323b;--head-fg:#e4edf0;--head-muted:#9db2bb;--panel2:#f4f7f8;--sel:#d9ebf1;--chip:#e3e9ec;
-  --bg:#eaeef0;--surface:#fff;--border:#cfd8dc;--border-strong:#b3c1c7;
-  --text:#1b282e;--text-2:#56666e;--text-3:#7f8e95;
-  --accent:#0c6a84;--accent-contrast:#fff;
+  --brand:#5a9bd5;--brand-dark:#2e4d6a;
+  --head:#1d3a52;--head-fg:#eaf2f9;--head-muted:#a3bdd3;--panel2:#f3f6f9;--sel:#deebf7;--chip:#e5ecf3;
+  --bg:#edf1f5;--surface:#fff;--border:#cfd9e3;--border-strong:#b2c1cf;
+  --text:#1a2733;--text-2:#536474;--text-3:#7d8d9c;
+  --accent:#2f72b0;--accent-contrast:#fff;
   --ok:#2c7a4b;--ok-bg:#e2f0e7;
   --warn:#a96300;--warn-bg:#f7ebd8;
   --bad:#b0281f;--bad-bg:#f7e2df;
-  --radius:4px;--radius-sm:3px;
+  --radius:6px;--radius-sm:4px;
+  --font-brand:'Poppins','Segoe UI',sans-serif;
   --font-display:'Barlow Semi Condensed','Arial Narrow',Arial,sans-serif;
   --font-ui:'IBM Plex Sans','Segoe UI',Roboto,sans-serif;
   --font-mono:'IBM Plex Mono',Consolas,'Courier New',monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --head:#0b1013;--head-fg:#dbe5e9;--head-muted:#7f949d;--panel2:#1f282d;--sel:#1e3a44;--chip:#26323a;
-    --bg:#111719;--surface:#192125;--border:#2e3b41;--border-strong:#41525a;
-    --text:#dbe5e9;--text-2:#93a4ac;--text-3:#6c7d85;
-    --accent:#52b4cf;--accent-contrast:#0a1a20;
+    --brand:#6aaee3;--brand-dark:#2e4d6a;
+    --head:#0c1620;--head-fg:#dfe9f2;--head-muted:#7f97ab;--panel2:#1c2732;--sel:#1b3347;--chip:#24313d;
+    --bg:#0f151b;--surface:#16202a;--border:#2b3946;--border-strong:#3e5060;
+    --text:#dbe6ef;--text-2:#93a6b6;--text-3:#687b8b;
+    --accent:#6aaee3;--accent-contrast:#08141f;
     --ok:#5fc48b;--ok-bg:rgba(95,196,139,0.14);
     --warn:#e2a64a;--warn-bg:rgba(226,166,74,0.15);
     --bad:#f0736a;--bad-bg:rgba(240,115,106,0.15);
@@ -368,23 +372,59 @@ details.menu[open]>summary{border-color:var(--accent);}
 .menu-pop button{background:none;border:0;text-align:left;padding:7px 10px;font:inherit;font-size:13.5px;color:var(--text);border-radius:3px;cursor:pointer;white-space:nowrap;}
 .menu-pop button:hover{background:var(--sel);}
 .menu-pop button.danger{color:var(--bad);}
+
+/* ── Marca AutoBox: logo, íconos y franjas de color ── */
+header.top{background:linear-gradient(180deg,var(--head) 0%,color-mix(in srgb,var(--head) 88%,#000) 100%);box-shadow:0 1px 0 rgba(0,0,0,.25);}
+.brand{align-items:center;gap:10px;font-family:var(--font-brand);}
+.brand-mark{width:40px;height:40px;color:var(--brand);flex-shrink:0;}
+.brand-word{font-family:var(--font-brand);font-weight:700;font-size:21px;letter-spacing:.06em;color:#fff;line-height:1;}
+.brand-sub{font-family:var(--font-brand);font-weight:500;font-size:11px;letter-spacing:.32em;color:var(--brand);line-height:1;padding-top:2px;}
+.nav-item{display:inline-flex;align-items:center;gap:6px;}
+.nav-item .ic{width:16px;height:16px;opacity:.75;}
+.nav-item.active{border-bottom-color:var(--brand);}
+.nav-item.active .ic{opacity:1;color:var(--brand);}
+.stat-row{position:relative;border-left:3px solid var(--brand);padding-right:40px;box-shadow:0 1px 2px rgba(16,32,48,.05);}
+.stat-row.is-warn{border-left-color:var(--warn);}
+.stat-row.is-bad{border-left-color:var(--bad);}
+.stat-ic{position:absolute;right:12px;top:12px;width:20px;height:20px;color:var(--brand);opacity:.55;}
+.stat-row.is-warn .stat-ic{color:var(--warn);}
+.stat-row.is-bad .stat-ic{color:var(--bad);}
+.table-wrap,.card-box{box-shadow:0 1px 2px rgba(16,32,48,.05);}
+.btn-new{box-shadow:0 1px 2px rgba(16,32,48,.15);}
+.content-header h1{font-size:24px;}
+@media(max-width:700px){
+  .brand-mark{width:32px;height:32px;}
+  .brand-word{font-size:18px;}
+  .brand-sub{font-size:9.5px;}
+  .stat-ic{width:17px;height:17px;top:10px;right:10px;}
+  .mini-table .hide-sm{display:none;}
+  .mini-table th,.mini-table td{padding-left:6px;padding-right:6px;}
+  .card-box{padding:12px;}
+}
 </style>
 </head>
 <body>
 
 <div class="shell">
   <header class="top"><div class="wrap">
-    <div class="brand">AutoBox · Inventario <small>taller</small></div>
+    <div class="brand"><svg class="brand-mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="13" y="4" width="31" height="31" rx="8" stroke-width="3.2"/>
+      <rect x="27" y="10" width="11" height="17" rx="3.5" stroke-width="2.8"/>
+      <path d="M27 21.5h11" stroke-width="2.6"/>
+      <circle cx="32.5" cy="14.8" r="1.5" fill="currentColor" stroke="none"/>
+      <g stroke-width="2.6"><circle cx="10" cy="27" r="3.6"/><path d="M10 20.6v2M10 31.4v2M3.6 27h2M14.4 27h2M5.5 22.5l1.4 1.4M13.1 30.1l1.4 1.4M5.5 31.5l1.4-1.4M13.1 23.9l1.4-1.4"/></g>
+      <g stroke-width="2.2"><circle cx="9" cy="40" r="2.3"/><path d="M9 35.6v1.3M9 43.1v1.3M4.6 40h1.3M12.1 40h1.3"/></g>
+    </svg><span class="brand-word">AUTOBOX</span><span class="brand-sub">INVENTARIO</span></div>
     <nav class="sidebar-nav" id="tabs">
-      <button class="nav-item active" id="tab-resumen" onclick="switchTab('resumen')">Resumen</button>
-      <button class="nav-item" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
-      <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')">Materiales</button>
-      <button class="nav-item" id="tab-produccion" onclick="switchTab('produccion')">Producción<span class="nav-badge" id="pr-badge"></span></button>
-      <button class="nav-item" id="tab-documentos" onclick="switchTab('documentos')">Documentos</button>
-      <button class="nav-item" id="tab-movimientos" onclick="switchTab('movimientos')">Movimientos</button>
-      <button class="nav-item" id="tab-bodegas" onclick="switchTab('bodegas')">Bodegas</button>
-      <button class="nav-item" id="tab-series" onclick="switchTab('series')">Series</button>
-      <button class="nav-item" id="tab-alertas" onclick="switchTab('alertas')">Stock crítico<span class="nav-badge" id="al-badge"></span></button>
+      <button class="nav-item active" id="tab-resumen" onclick="switchTab('resumen')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Resumen</button>
+      <button class="nav-item" id="tab-maquinas" onclick="switchTab('maquinas')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M15 15v2"/></svg>Máquinas</button>
+      <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12M7.5 4.21l9 5.19"/></svg>Materiales</button>
+      <button class="nav-item" id="tab-produccion" onclick="switchTab('produccion')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Producción<span class="nav-badge" id="pr-badge"></span></button>
+      <button class="nav-item" id="tab-documentos" onclick="switchTab('documentos')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Documentos</button>
+      <button class="nav-item" id="tab-movimientos" onclick="switchTab('movimientos')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4M3 8h18M17 20l4-4-4-4M21 16H3"/></svg>Movimientos</button>
+      <button class="nav-item" id="tab-bodegas" onclick="switchTab('bodegas')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M7 21v-8h10v8M7 17h10"/></svg>Bodegas</button>
+      <button class="nav-item" id="tab-series" onclick="switchTab('series')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5v14M7 5v14M10 5v14M14 5v14M17 5v14M21 5v14"/></svg>Series</button>
+      <button class="nav-item" id="tab-alertas" onclick="switchTab('alertas')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4M12 17h.01"/></svg>Stock crítico<span class="nav-badge" id="al-badge"></span></button>
     </nav>
   </div></header>
 
@@ -393,67 +433,67 @@ details.menu[open]>summary{border-color:var(--accent);}
     <div class="sidebar-stats">
       <div class="stat-group active" id="stats-resumen">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Valor del inventario</span><b class="mono" id="rs-valor">$0,00</b></div>
-        <div class="stat-row"><span>Máquinas en stock</span><b class="mono" id="rs-maq">0</b></div>
-        <div class="stat-row"><span>Modelos para armar hoy</span><b class="mono" id="rs-armables">0</b></div>
-        <div class="stat-row"><span>Bajo el mínimo</span><b class="mono warn" id="rs-bajos">0</b></div>
-        <div class="stat-row"><span>Documentos este mes</span><b class="mono" id="rs-mes">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Valor del inventario</span><b class="mono" id="rs-valor">$0,00</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M15 15v2"/></svg><span>Máquinas en stock</span><b class="mono" id="rs-maq">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Modelos para armar hoy</span><b class="mono" id="rs-armables">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg><span>Bajo el mínimo</span><b class="mono warn" id="rs-bajos">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Documentos este mes</span><b class="mono" id="rs-mes">0</b></div>
       </div>
       <div class="stat-group" id="stats-maquinas">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Total modelos</span><b class="mono" id="mq-total">0</b></div>
-        <div class="stat-row"><span>Stock total</span><b class="mono" id="mq-stock">0</b></div>
-        <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="mq-bajo">0</b></div>
-        <div class="stat-row"><span>Sin stock</span><b class="mono bad" id="mq-cero">0</b></div>
-        <div class="stat-row"><span>Valor a costo (kárdex)</span><b class="mono" id="mq-valor">$0.00</b></div>
-        <div class="stat-row"><span>Valor a precio de venta</span><b class="mono" id="mq-venta">$0.00</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M15 15v2"/></svg><span>Total modelos</span><b class="mono" id="mq-total">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg><span>Stock total</span><b class="mono" id="mq-stock">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg><span>Stock bajo</span><b class="mono warn" id="mq-bajo">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><span>Sin stock</span><b class="mono bad" id="mq-cero">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Valor a costo (kárdex)</span><b class="mono" id="mq-valor">$0.00</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l8.59-8.59a1 1 0 0 0 0-1.41z"/><circle cx="7" cy="7" r="1.5"/></svg><span>Valor a precio de venta</span><b class="mono" id="mq-venta">$0.00</b></div>
       </div>
       <div class="stat-group" id="stats-materiales">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Total ítems</span><b class="mono" id="mt-total">0</b></div>
-        <div class="stat-row"><span>Stock total</span><b class="mono" id="mt-stock">0</b></div>
-        <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="mt-bajo">0</b></div>
-        <div class="stat-row"><span>Sin stock</span><b class="mono bad" id="mt-cero">0</b></div>
-        <div class="stat-row"><span>Valor (kárdex)</span><b class="mono" id="mt-valor">$0.00</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12M7.5 4.21l9 5.19"/></svg><span>Total ítems</span><b class="mono" id="mt-total">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg><span>Stock total</span><b class="mono" id="mt-stock">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg><span>Stock bajo</span><b class="mono warn" id="mt-bajo">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><span>Sin stock</span><b class="mono bad" id="mt-cero">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Valor (kárdex)</span><b class="mono" id="mt-valor">$0.00</b></div>
       </div>
       <div class="stat-group" id="stats-produccion">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Con receta</span><b class="mono" id="pr-con">0</b></div>
-        <div class="stat-row"><span>Sin receta</span><b class="mono warn" id="pr-sin">0</b></div>
-        <div class="stat-row"><span>Se pueden armar</span><b class="mono" id="pr-armables">0</b></div>
-        <div class="stat-row"><span>Sin componentes</span><b class="mono bad" id="pr-bloq">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span>Con receta</span><b class="mono" id="pr-con">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span>Sin receta</span><b class="mono warn" id="pr-sin">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Se pueden armar</span><b class="mono" id="pr-armables">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg><span>Sin componentes</span><b class="mono bad" id="pr-bloq">0</b></div>
       </div>
       <div class="stat-group" id="stats-documentos">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Documentos</span><b class="mono" id="dc-total">0</b></div>
-        <div class="stat-row"><span>Este mes</span><b class="mono warn" id="dc-mes">0</b></div>
-        <div class="stat-row"><span>Anulados</span><b class="mono bad" id="dc-anulados">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg><span>Documentos</span><b class="mono" id="dc-total">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Este mes</span><b class="mono warn" id="dc-mes">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M14.5 12.5l-5 5M9.5 12.5l5 5"/></svg><span>Anulados</span><b class="mono bad" id="dc-anulados">0</b></div>
       </div>
       <div class="stat-group" id="stats-bodegas">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Bodegas</span><b class="mono" id="bd-total">0</b></div>
-        <div class="stat-row"><span>Ítems fuera de la principal</span><b class="mono" id="bd-fuera">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M7 21v-8h10v8M7 17h10"/></svg><span>Bodegas</span><b class="mono" id="bd-total">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17h4V5H2v12h3M14 9h4l4 4v4h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg><span>Ítems fuera de la principal</span><b class="mono" id="bd-fuera">0</b></div>
       </div>
       <div class="stat-group" id="stats-series">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Series registradas</span><b class="mono" id="sr-total">0</b></div>
-        <div class="stat-row"><span>En bodega</span><b class="mono" id="sr-bodega">0</b></div>
-        <div class="stat-row"><span>Vendidas</span><b class="mono" id="sr-vendidas">0</b></div>
-        <div class="stat-row"><span>Instaladas</span><b class="mono" id="sr-instaladas">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5v14M7 5v14M10 5v14M14 5v14M17 5v14M21 5v14"/></svg><span>Series registradas</span><b class="mono" id="sr-total">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M7 21v-8h10v8M7 17h10"/></svg><span>En bodega</span><b class="mono" id="sr-bodega">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l8.59-8.59a1 1 0 0 0 0-1.41z"/><circle cx="7" cy="7" r="1.5"/></svg><span>Vendidas</span><b class="mono" id="sr-vendidas">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Instaladas</span><b class="mono" id="sr-instaladas">0</b></div>
       </div>
       <div class="stat-group" id="stats-movimientos">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Total</span><b class="mono" id="mv-total">0</b></div>
-        <div class="stat-row"><span>Entradas</span><b class="mono" id="mv-entradas">0</b></div>
-        <div class="stat-row"><span>Salidas</span><b class="mono bad" id="mv-salidas">0</b></div>
-        <div class="stat-row"><span>Este mes</span><b class="mono warn" id="mv-mes">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4M3 8h18M17 20l4-4-4-4M21 16H3"/></svg><span>Total</span><b class="mono" id="mv-total">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg><span>Entradas</span><b class="mono" id="mv-entradas">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span>Salidas</span><b class="mono bad" id="mv-salidas">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Este mes</span><b class="mono warn" id="mv-mes">0</b></div>
       </div>
       <div class="stat-group" id="stats-alertas">
         <div class="stat-title">Resumen</div>
-        <div class="stat-row"><span>Sin stock (0)</span><b class="mono bad" id="al-cero">0</b></div>
-        <div class="stat-row"><span>Stock bajo</span><b class="mono warn" id="al-bajo">0</b></div>
-        <div class="stat-row"><span>Máquinas</span><b class="mono" id="al-mq">0</b></div>
-        <div class="stat-row"><span>Materiales</span><b class="mono" id="al-mt">0</b></div>
+        <div class="stat-row is-bad"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><span>Sin stock (0)</span><b class="mono bad" id="al-cero">0</b></div>
+        <div class="stat-row is-warn"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg><span>Stock bajo</span><b class="mono warn" id="al-bajo">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M9 10h6M15 15v2"/></svg><span>Máquinas</span><b class="mono" id="al-mq">0</b></div>
+        <div class="stat-row"><svg class="ic stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12M7.5 4.21l9 5.19"/></svg><span>Materiales</span><b class="mono" id="al-mt">0</b></div>
       </div>
     </div>
 
@@ -2327,31 +2367,31 @@ function renderResumen(){
   document.getElementById('rs-bajos-n').textContent=bajos.length;
 
   const MAX=8;
-  document.getElementById('rs-bajo').innerHTML=bajos.length?'<table class="mini-table"><thead><tr><th>Ítem</th><th class="num">Stock</th><th class="num">Mín.</th><th class="num">Faltan</th><th></th></tr></thead><tbody>'+
+  document.getElementById('rs-bajo').innerHTML=bajos.length?'<table class="mini-table"><thead><tr><th>Ítem</th><th class="num">Stock</th><th class="num hide-sm">Mín.</th><th class="num">Faltan</th><th></th></tr></thead><tbody>'+
     bajos.slice(0,MAX).map(i=>{
       const falta=r4(Math.max(0,i.stock_minimo-i.stock));
       return '<tr><td>'+escHtml(i.nombre)+'<span class="mini-note">'+(i.tipo==='maquina'?'Máquina':'Material')+'</span></td>'+
         '<td class="num" style="color:'+(i.stock<=0?'var(--bad)':'var(--warn)')+';">'+i.stock+' '+escHtml(i.unidad||'unidad')+barraStock(i)+'</td>'+
-        '<td class="num">'+i.stock_minimo+'</td><td class="num">'+(falta?falta:'—')+'</td>'+
+        '<td class="num hide-sm">'+i.stock_minimo+'</td><td class="num">'+(falta?falta:'—')+'</td>'+
         '<td class="act"><button class="btn-sm in" onclick="abrirModal(\''+i.id+'\',\''+i.tipo+'\',\'entrada\')">＋ Entrada</button></td></tr>';
     }).join('')+'</tbody></table>'+(bajos.length>MAX?'<div class="empty-mini">y '+(bajos.length-MAX)+' más en Stock crítico.</div>':'')
     :'<div class="empty-mini">Todo está sobre su stock mínimo 👍</div>';
 
-  document.getElementById('rs-armar').innerHTML=armar.length?'<table class="mini-table"><thead><tr><th>Máquina</th><th class="num">Se arman</th><th class="num">En stock</th><th></th></tr></thead><tbody>'+
+  document.getElementById('rs-armar').innerHTML=armar.length?'<table class="mini-table"><thead><tr><th>Máquina</th><th class="num">Se arman</th><th class="num hide-sm">En stock</th><th></th></tr></thead><tbody>'+
     armar.map(a=>'<tr><td>'+escHtml(a.m.nombre)+
       (a.n<=0&&a.lim?'<span class="mini-note" style="color:var(--bad);">Falta '+escHtml(a.lim.mat?a.lim.mat.nombre:'un material eliminado')+'</span>':
        a.lim&&a.lim.mat?'<span class="mini-note">Limita: '+escHtml(a.lim.mat.nombre)+'</span>':'')+'</td>'+
       '<td class="num" style="color:'+(a.n>0?'var(--ok)':'var(--bad)')+';font-weight:600;">'+a.n+'</td>'+
-      '<td class="num">'+a.m.stock+'</td>'+
+      '<td class="num hide-sm">'+a.m.stock+'</td>'+
       '<td class="act">'+(a.n>0?'<button class="btn-sm primary" onclick="abrirFabricar(\''+a.m.id+'\')">Fabricar</button>':'')+'</td></tr>').join('')+'</tbody></table>'
     :'<div class="empty-mini">Ninguna máquina tiene receta todavía. Créalas en Producción.</div>';
 
   const ult=docsCache.slice(0,6);
-  document.getElementById('rs-docs').innerHTML=ult.length?'<table class="mini-table"><thead><tr><th>Documento</th><th>Fecha</th><th>Tipo</th><th>Referencia</th><th class="num">Valor</th></tr></thead><tbody>'+
+  document.getElementById('rs-docs').innerHTML=ult.length?'<table class="mini-table"><thead><tr><th>Documento</th><th class="hide-sm">Fecha</th><th>Tipo</th><th class="hide-sm">Referencia</th><th class="num">Valor</th></tr></thead><tbody>'+
     ult.map(d=>'<tr class="click" onclick="irADoc(\''+d.key+'\')"><td class="mono" style="white-space:nowrap;">'+(d.doc?escHtml(d.doc):'<span style="color:var(--text-3);">sin número</span>')+'</td>'+
-      '<td style="white-space:nowrap;">'+escHtml(d.fecha||'—')+'</td>'+
+      '<td class="hide-sm" style="white-space:nowrap;">'+escHtml(d.fecha||'—')+'</td>'+
       '<td>'+escHtml(d.tipoNom)+(d.anulado?'<span class="tag bad">anulado</span>':'')+'</td>'+
-      '<td>'+escHtml(d.ref||'—')+'</td><td class="num">'+fmtMoney(d.valor)+'</td></tr>').join('')+'</tbody></table>'
+      '<td class="hide-sm">'+escHtml(d.ref||'—')+'</td><td class="num">'+fmtMoney(d.valor)+'</td></tr>').join('')+'</tbody></table>'
     :'<div class="empty-mini">Aún no hay movimientos.</div>';
 }
 function irADoc(key){
