@@ -326,6 +326,48 @@ table.doc-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.8
   .data-table .kx-table td::before{display:none;}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+/* ── Resumen ── */
+.res-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:4px;}
+.res-grid .card-box{margin-top:0;}
+@media(max-width:860px){.res-grid{grid-template-columns:minmax(0,1fr);}}
+.card-box h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.card-box h3 .link{margin-left:auto;font-family:var(--font-ui);font-size:12.5px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--accent);background:none;border:0;cursor:pointer;padding:0;}
+.card-box h3 .link:hover{text-decoration:underline;}
+.mini-scroll{overflow-x:auto;}
+.mini-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.mini-table th{font-family:var(--font-display);font-weight:600;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-2);text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.mini-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.mini-table tr:last-child td{border-bottom:none;}
+.mini-table .num{text-align:right;font-family:var(--font-mono);white-space:nowrap;}
+.mini-table td.act{text-align:right;white-space:nowrap;}
+.mini-table tr.click{cursor:pointer;}
+.mini-table tr.click:hover td{background:var(--sel);}
+.mini-note{display:block;font-size:12px;color:var(--text-3);}
+.empty-mini{color:var(--text-3);padding:12px 0 4px;font-size:13.5px;}
+
+/* ── Barra de stock: la marca del medio es el mínimo ── */
+.estado{display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
+.sbar{display:block;position:relative;width:100%;min-width:70px;max-width:110px;height:5px;border-radius:3px;background:var(--chip);overflow:hidden;}
+.sbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;}
+.sbar::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--text-3);opacity:.7;}
+@media(max-width:760px){.estado{align-items:flex-end;}}
+.num .sbar{margin:4px 0 0 auto;}
+
+/* ── Acciones con texto y menú ⋯ ── */
+.table-wrap{overflow:visible;}
+.data-table thead th:first-child{border-top-left-radius:var(--radius);}
+.data-table thead th:last-child{border-top-right-radius:var(--radius);}
+.btn-sm.in{color:var(--ok);}
+.btn-sm.out{color:var(--bad);}
+details.menu{position:relative;display:inline-block;}
+details.menu>summary{list-style:none;display:inline-block;font-weight:700;letter-spacing:.08em;}
+details.menu>summary::-webkit-details-marker{display:none;}
+details.menu[open]>summary{border-color:var(--accent);}
+.menu-pop{position:absolute;right:0;top:calc(100% + 4px);z-index:60;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.16);display:flex;flex-direction:column;min-width:160px;padding:4px;}
+.menu-pop button{background:none;border:0;text-align:left;padding:7px 10px;font:inherit;font-size:13.5px;color:var(--text);border-radius:3px;cursor:pointer;white-space:nowrap;}
+.menu-pop button:hover{background:var(--sel);}
+.menu-pop button.danger{color:var(--bad);}
 </style>
 </head>
 <body>
@@ -334,7 +376,8 @@ table.doc-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.8
   <header class="top"><div class="wrap">
     <div class="brand">AutoBox · Inventario <small>taller</small></div>
     <nav class="sidebar-nav" id="tabs">
-      <button class="nav-item active" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
+      <button class="nav-item active" id="tab-resumen" onclick="switchTab('resumen')">Resumen</button>
+      <button class="nav-item" id="tab-maquinas" onclick="switchTab('maquinas')">Máquinas</button>
       <button class="nav-item" id="tab-materiales" onclick="switchTab('materiales')">Materiales</button>
       <button class="nav-item" id="tab-produccion" onclick="switchTab('produccion')">Producción<span class="nav-badge" id="pr-badge"></span></button>
       <button class="nav-item" id="tab-documentos" onclick="switchTab('documentos')">Documentos</button>
@@ -348,7 +391,15 @@ table.doc-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.8
   <main class="content wrap">
     <div class="banner-srv" id="banner-srv" hidden>El Apps Script todavía no tiene la versión con documentos, bodegas y series. Mientras tanto <b>no se pueden registrar entradas, salidas ni fabricaciones</b>. Pega el <b>Codigo.gs</b> nuevo y publícalo como <b>Nueva versión</b>.</div>
     <div class="sidebar-stats">
-      <div class="stat-group active" id="stats-maquinas">
+      <div class="stat-group active" id="stats-resumen">
+        <div class="stat-title">Resumen</div>
+        <div class="stat-row"><span>Valor del inventario</span><b class="mono" id="rs-valor">$0,00</b></div>
+        <div class="stat-row"><span>Máquinas en stock</span><b class="mono" id="rs-maq">0</b></div>
+        <div class="stat-row"><span>Modelos para armar hoy</span><b class="mono" id="rs-armables">0</b></div>
+        <div class="stat-row"><span>Bajo el mínimo</span><b class="mono warn" id="rs-bajos">0</b></div>
+        <div class="stat-row"><span>Documentos este mes</span><b class="mono" id="rs-mes">0</b></div>
+      </div>
+      <div class="stat-group" id="stats-maquinas">
         <div class="stat-title">Resumen</div>
         <div class="stat-row"><span>Total modelos</span><b class="mono" id="mq-total">0</b></div>
         <div class="stat-row"><span>Stock total</span><b class="mono" id="mq-stock">0</b></div>
@@ -407,7 +458,29 @@ table.doc-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.8
     </div>
 
     <!-- ═══ MÁQUINAS ═══ -->
-    <div class="tab-panel active" id="panel-maquinas">
+    <!-- ═══ RESUMEN ═══ -->
+    <div class="tab-panel active" id="panel-resumen">
+      <div class="content-header">
+        <h1>Resumen</h1>
+        <button class="btn-new" onclick="abrirDoc()">+ Nuevo documento</button>
+      </div>
+      <div class="res-grid">
+        <div class="card-box">
+          <h3>Por comprar <span class="section-count warn" id="rs-bajos-n">0</span><button class="link" onclick="switchTab('alertas')">Ver stock crítico →</button></h3>
+          <div class="mini-scroll" id="rs-bajo"></div>
+        </div>
+        <div class="card-box">
+          <h3>Se pueden armar hoy<button class="link" onclick="switchTab('produccion')">Ir a Producción →</button></h3>
+          <div class="mini-scroll" id="rs-armar"></div>
+        </div>
+      </div>
+      <div class="card-box">
+        <h3>Últimos documentos<button class="link" onclick="switchTab('documentos')">Ver todos →</button></h3>
+        <div class="mini-scroll" id="rs-docs"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-maquinas">
       <div class="content-header">
         <h1>Máquinas</h1>
         <button class="btn-new" onclick="toggleDrawer('maquina')">+ Nueva máquina</button>
@@ -2225,13 +2298,81 @@ async function confirmarActivarSerie(){
   finally{actOcupado=false;btn.disabled=false;btn.textContent='Activar control por serie';}
 }
 
+// ── RESUMEN ──────────────────────────────────────────────
+// Barra de stock: llena = el doble del mínimo; la marca del medio es el mínimo.
+function barraStock(item){
+  const st=Number(item.stock)||0, min=Number(item.stock_minimo)||0;
+  if(min<=0&&st>0)return '';
+  const pct=min>0?Math.min(100,Math.round(st/(2*min)*100)):0;
+  const color=st<=0?'var(--bad)':st<=min?'var(--warn)':'var(--ok)';
+  return '<span class="sbar" title="Stock '+st+' · mínimo '+min+'"><i style="width:'+pct+'%;background:'+color+';"></i></span>';
+}
+function renderResumen(){
+  const todos=[...maquinas.map(i=>({...i,tipo:'maquina'})),...materiales.map(i=>({...i,tipo:'material'}))];
+  const nivel=i=>i.stock_minimo>0?i.stock/i.stock_minimo:(i.stock>0?1:0);
+  const bajos=todos.filter(i=>i.stock<=0||(i.stock_minimo>0&&i.stock<=i.stock_minimo))
+    .sort((a,b)=>nivel(a)-nivel(b)||a.nombre.localeCompare(b.nombre));
+  // Por máquina con receta: cuántas se arman con el stock total y qué componente limita
+  const armar=maquinas.filter(m=>getReceta(m.id).length).map(m=>{
+    const rc=getReceta(m.id);
+    const lim=rc.map(l=>({mat:getMaterial(l.material_id),l})).sort((a,b)=>(a.mat?a.mat.stock/a.l.cantidad:-1)-(b.mat?b.mat.stock/b.l.cantidad:-1))[0];
+    return {m,n:armables(rc),lim};
+  }).sort((a,b)=>b.n-a.n||a.m.nombre.localeCompare(b.m.nombre));
+
+  document.getElementById('rs-valor').textContent=fmtMoney(todos.reduce((s,i)=>s+getKardex(i.tipo,i.id).v,0));
+  document.getElementById('rs-maq').textContent=maquinas.reduce((s,m)=>s+m.stock,0);
+  document.getElementById('rs-armables').textContent=armar.filter(a=>a.n>0).length;
+  document.getElementById('rs-bajos').textContent=bajos.length;
+  document.getElementById('rs-mes').textContent=docsCache.filter(d=>d.doc&&getMesMov(d)).length;
+  document.getElementById('rs-bajos-n').textContent=bajos.length;
+
+  const MAX=8;
+  document.getElementById('rs-bajo').innerHTML=bajos.length?'<table class="mini-table"><thead><tr><th>Ítem</th><th class="num">Stock</th><th class="num">Mín.</th><th class="num">Faltan</th><th></th></tr></thead><tbody>'+
+    bajos.slice(0,MAX).map(i=>{
+      const falta=r4(Math.max(0,i.stock_minimo-i.stock));
+      return '<tr><td>'+escHtml(i.nombre)+'<span class="mini-note">'+(i.tipo==='maquina'?'Máquina':'Material')+'</span></td>'+
+        '<td class="num" style="color:'+(i.stock<=0?'var(--bad)':'var(--warn)')+';">'+i.stock+' '+escHtml(i.unidad||'unidad')+barraStock(i)+'</td>'+
+        '<td class="num">'+i.stock_minimo+'</td><td class="num">'+(falta?falta:'—')+'</td>'+
+        '<td class="act"><button class="btn-sm in" onclick="abrirModal(\''+i.id+'\',\''+i.tipo+'\',\'entrada\')">＋ Entrada</button></td></tr>';
+    }).join('')+'</tbody></table>'+(bajos.length>MAX?'<div class="empty-mini">y '+(bajos.length-MAX)+' más en Stock crítico.</div>':'')
+    :'<div class="empty-mini">Todo está sobre su stock mínimo 👍</div>';
+
+  document.getElementById('rs-armar').innerHTML=armar.length?'<table class="mini-table"><thead><tr><th>Máquina</th><th class="num">Se arman</th><th class="num">En stock</th><th></th></tr></thead><tbody>'+
+    armar.map(a=>'<tr><td>'+escHtml(a.m.nombre)+
+      (a.n<=0&&a.lim?'<span class="mini-note" style="color:var(--bad);">Falta '+escHtml(a.lim.mat?a.lim.mat.nombre:'un material eliminado')+'</span>':
+       a.lim&&a.lim.mat?'<span class="mini-note">Limita: '+escHtml(a.lim.mat.nombre)+'</span>':'')+'</td>'+
+      '<td class="num" style="color:'+(a.n>0?'var(--ok)':'var(--bad)')+';font-weight:600;">'+a.n+'</td>'+
+      '<td class="num">'+a.m.stock+'</td>'+
+      '<td class="act">'+(a.n>0?'<button class="btn-sm primary" onclick="abrirFabricar(\''+a.m.id+'\')">Fabricar</button>':'')+'</td></tr>').join('')+'</tbody></table>'
+    :'<div class="empty-mini">Ninguna máquina tiene receta todavía. Créalas en Producción.</div>';
+
+  const ult=docsCache.slice(0,6);
+  document.getElementById('rs-docs').innerHTML=ult.length?'<table class="mini-table"><thead><tr><th>Documento</th><th>Fecha</th><th>Tipo</th><th>Referencia</th><th class="num">Valor</th></tr></thead><tbody>'+
+    ult.map(d=>'<tr class="click" onclick="irADoc(\''+d.key+'\')"><td class="mono" style="white-space:nowrap;">'+(d.doc?escHtml(d.doc):'<span style="color:var(--text-3);">sin número</span>')+'</td>'+
+      '<td style="white-space:nowrap;">'+escHtml(d.fecha||'—')+'</td>'+
+      '<td>'+escHtml(d.tipoNom)+(d.anulado?'<span class="tag bad">anulado</span>':'')+'</td>'+
+      '<td>'+escHtml(d.ref||'—')+'</td><td class="num">'+fmtMoney(d.valor)+'</td></tr>').join('')+'</tbody></table>'
+    :'<div class="empty-mini">Aún no hay movimientos.</div>';
+}
+function irADoc(key){
+  switchTab('documentos');
+  docAbierto=key;
+  renderDocumentos();
+  const b=document.querySelector('#dc-list button[onclick="verDoc(\''+key+'\')"]');
+  if(b)b.closest('tr').scrollIntoView({block:'center'});
+}
+// El menú ⋯ se cierra al elegir una opción o al hacer clic afuera
+document.addEventListener('click',e=>{
+  document.querySelectorAll('details.menu[open]').forEach(d=>{if(!d.contains(e.target)||e.target.closest('.menu-pop'))d.open=false;});
+});
+
 // ── RENDER ────────────────────────────────────────────────
 function render(){
   kardexCache=calcKardexAll();
   bodCache=calcBodegas();seriesCache=calcSeries();docsCache=agruparDocs();
   document.getElementById('banner-srv').hidden=servidorNuevo!==false;
   renderMaquinas();renderMateriales();renderMovimientos();renderAlertas();renderProduccion();
-  renderDocumentos();renderBodegas();renderSeries();
+  renderDocumentos();renderBodegas();renderSeries();renderResumen();
   if(fabData&&!fabOcupado)renderFabricar();
   if(kardexAbierto)abrirKardex(kardexAbierto.id,kardexAbierto.tipo);
 }
@@ -2295,13 +2436,15 @@ function renderItems(items,catsMap,listId,filtersId,filtro,searchId,tipo){
       '<td data-label="Stock" class="num">'+item.stock+'</td>'+
       '<td data-label="Mín." class="num">'+item.stock_minimo+'</td>'+
       '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
-      '<td data-label="Estado"><span class="status-pill '+statusClass+'">'+statusTxt+'</span></td>'+
+      '<td data-label="Estado"><div class="estado"><span class="status-pill '+statusClass+'">'+statusTxt+'</span>'+barraStock(item)+'</div></td>'+
       '<td class="actions" data-label="">'+
-        (tipo==='maquina'&&getReceta(item.id).length?'<button class="icon-btn fab" title="Fabricar" onclick="abrirFabricar(\''+item.id+'\')">'+ICON_FAB+'</button>':'')+
-        '<button class="icon-btn kx" title="Kárdex" onclick="abrirKardex(\''+item.id+'\',\''+tipo+'\')">'+ICON_KX+'</button>'+
-        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\')">'+ICON_UP+'</button>'+
-        '<button class="icon-btn sub" title="Salida" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\')">'+ICON_DOWN+'</button>'+
-        '<button class="icon-btn del" title="Eliminar" onclick="eliminarItem(\''+item.id+'\',\''+tipo+'\')">'+ICON_TRASH+'</button>'+
+        '<button class="btn-sm in" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'entrada\')">＋ Entrada</button>'+
+        '<button class="btn-sm out" onclick="abrirModal(\''+item.id+'\',\''+tipo+'\',\'salida\')">− Salida</button>'+
+        '<details class="menu"><summary class="btn-sm" title="Más opciones">⋯</summary><div class="menu-pop">'+
+          (tipo==='maquina'&&getReceta(item.id).length?'<button onclick="abrirFabricar(\''+item.id+'\')">Fabricar</button>':'')+
+          '<button onclick="abrirKardex(\''+item.id+'\',\''+tipo+'\')">Ver kárdex</button>'+
+          '<button class="danger" onclick="eliminarItem(\''+item.id+'\',\''+tipo+'\')">Eliminar</button>'+
+        '</div></details>'+
       '</td>'+
     '</tr>';
   }).join('');
@@ -2379,11 +2522,11 @@ function renderAlertaRows(items,listId,msgVacio){
       '<td data-label="Nombre" class="cell-name">'+escHtml(item.nombre)+(item.nota?'<span class="cell-note">'+escHtml(item.nota)+'</span>':'')+'</td>'+
       '<td data-label="Tipo">'+(item.tipo==='maquina'?'Máquina':'Material')+'</td>'+
       '<td data-label="Categoría">'+escHtml(c.label)+'</td>'+
-      '<td data-label="Stock" class="num" style="color:'+color+';">'+item.stock+'</td>'+
+      '<td data-label="Stock" class="num" style="color:'+color+';">'+item.stock+barraStock(item)+'</td>'+
       '<td data-label="Mín." class="num">'+item.stock_minimo+'</td>'+
       '<td data-label="Unidad">'+escHtml(item.unidad||'unidad')+'</td>'+
       '<td class="actions" data-label="">'+
-        '<button class="icon-btn add" title="Entrada" onclick="abrirModal(\''+item.id+'\',\''+item.tipo+'\',\'entrada\')">'+ICON_UP+'</button>'+
+        '<button class="btn-sm in" onclick="abrirModal(\''+item.id+'\',\''+item.tipo+'\',\'entrada\')">＋ Entrada</button>'+
       '</td>'+
     '</tr>';
   }).join('');
@@ -2613,7 +2756,7 @@ function setFiltroMov(f){
 }
 
 function switchTab(tab){
-  ['maquinas','materiales','produccion','documentos','movimientos','bodegas','series','alertas'].forEach(t=>{
+  ['resumen','maquinas','materiales','produccion','documentos','movimientos','bodegas','series','alertas'].forEach(t=>{
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('stats-'+t).classList.toggle('active',t===tab);
